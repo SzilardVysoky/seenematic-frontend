@@ -1,0 +1,5 @@
+<nav class="flex justify-center bg-gray-800 text-white py-2">
+    <a routerLink="/" class="px-4 py-2 hover:bg-gray-700 rounded">Home</a>
+    <a routerLink="/reviews" class="px-4 py-2 hover:bg-gray-700 rounded">All Movies</a>
+    <a *ngIf="authService.isAuthenticated()" routerLink="/profile" class="px-4 py-2 hover:bg-gray-700 rounded">Profile</a>    <a routerLink="/search" class="px-4 py-2 hover:bg-gray-700 rounded">Search</a>
+</nav>

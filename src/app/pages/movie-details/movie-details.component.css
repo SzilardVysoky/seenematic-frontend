@@ -1,0 +1,18 @@
+.star::before {
+    content: '★'; /* Use a star character for the shape */
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: inherit; /* Allows color to change based on ngClass */
+  }
+  
+  .cursor-pointer:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .text-yellow-500 {
+    color: #f5c518; /* Yellow color for selected stars */
+  }
+  
+  .text-gray-300 {
+    color: #d1d5db; /* Light gray for unselected stars */
+  }

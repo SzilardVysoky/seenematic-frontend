@@ -1,0 +1,48 @@
+<section class="movie-details max-w-screen-lg mx-auto my-6 p-4 bg-gray-100 rounded-lg">
+  <!-- Movie Information Section -->
+  <div class="flex flex-col md:flex-row gap-6">
+    <img [src]="'movie.jpg'" alt="Movie Poster" class="w-full md:w-1/3 h-auto rounded" />
+    <div>
+      <h2 class="text-3xl font-bold">{{ movie.title }}</h2>
+      <p class="text-gray-600 my-2">{{ movie.rating }}</p>
+      <p class="text-lg my-4">{{ movie.description }}</p>
+      <button class="mt-4 bg-blue-600 text-white py-2 px-6 rounded">Watch Trailer</button>
+    </div>
+  </div>
+
+  <!-- User Reviews Section -->
+  <div class="reviews mt-8">
+    <h3 class="text-2xl font-semibold">User Reviews</h3>
+    <div *ngFor="let review of reviews" class="review bg-white rounded shadow-md p-4 my-4">
+      <p class="font-bold">{{ review.username }} - <span [innerHTML]="getStars(review.rating)"></span></p>
+      <p class="text-gray-600">{{ review.content }}</p>
+    </div>
+  </div>
+
+  <!-- Add Review with Star Rating Section -->
+  <div class="add-review mt-8 p-4 bg-gray-200 rounded-lg">
+    <h3 class="text-xl font-semibold mb-4">Add Your Review and Rating</h3>
+    <ng-container *ngIf="authService.isAuthenticated(); else loginPrompt">
+      <textarea [(ngModel)]="newReviewContent" rows="3" class="w-full p-2 border border-gray-300 rounded mb-4" placeholder="Write your review here..."></textarea>
+
+      <!-- Star Rating Selection with CSS-based Stars -->
+<div class="star-rating mb-4">
+  <span *ngFor="let star of [1, 2, 3, 4, 5]"
+        (click)="newReviewRating = star" 
+        (mouseenter)="hoverRating = star" 
+        (mouseleave)="hoverRating = null"
+        class="star cursor-pointer"
+        [ngClass]="{
+          'text-yellow-500': star <= (hoverRating || newReviewRating), 
+          'text-gray-300': star > (hoverRating || newReviewRating)
+        }">
+  </span>
+</div>
+
+      <button class="bg-blue-600 text-white py-2 px-6 rounded" (click)="submitReview()">Submit Review</button>
+    </ng-container>
+    <ng-template #loginPrompt>
+      <p class="text-gray-600">Please <a routerLink="/login" class="text-blue-600 underline">login</a> to add a review.</p>
+    </ng-template>
+  </div>
+</section>
