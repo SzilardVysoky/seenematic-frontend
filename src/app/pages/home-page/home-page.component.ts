@@ -1,4 +1,4 @@
-import { NgFor, NgStyle } from '@angular/common';
+import { NgFor, NgStyle, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -6,44 +6,44 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [NgFor, NgStyle, FormsModule, RouterModule], 
+  imports: [NgFor, NgStyle, NgClass, FormsModule, RouterModule],
   templateUrl: './home-page.component.html',
-  styleUrl: './home-page.component.css'
+  styleUrls: []
 })
-
 export class HomePageComponent {
   recommendedMovies = Array(10).fill({ title: 'Recommended Movie', rating: '⭐⭐⭐⭐', image: 'assets/movie-placeholder.jpg' });
   latestMovies = Array(10).fill({ title: 'Latest Movie', genre: 'Action', rating: '⭐⭐⭐⭐', image: 'assets/movie-placeholder.jpg' });
 
   currentRecommendedIndex = 0;
   currentLatestIndex = 0;
-  visibleItems = 5; // Default number of visible items
+
+  carouselItemWidth = 'lg:w-1/4'; // Default width for 4 items
 
   constructor() {
-    this.updateVisibleItems(window.innerWidth); // Set initial visible items based on screen width
+    this.updateCarouselItemWidth(window.innerWidth);
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
-    this.updateVisibleItems((event.target as Window).innerWidth);
+    this.updateCarouselItemWidth((event.target as Window).innerWidth);
   }
 
-  updateVisibleItems(width: number) {
+  updateCarouselItemWidth(width: number) {
     if (width <= 320) {
-      this.visibleItems = 1;
+      this.carouselItemWidth = 'w-full'; // 1 item
     } else if (width <= 480) {
-      this.visibleItems = 2;
+      this.carouselItemWidth = 'w-1/2'; // 2 items
     } else if (width <= 768) {
-      this.visibleItems = 3;
+      this.carouselItemWidth = 'w-1/3'; // 3 items
     } else if (width <= 1024) {
-      this.visibleItems = 4;
+      this.carouselItemWidth = 'w-1/4'; // 4 items
     } else {
-      this.visibleItems = 5;
+      this.carouselItemWidth = 'w-1/5'; // 5 items
     }
   }
 
   moveCarousel(type: string, direction: number) {
-    const maxIndex = (type === 'recommended' ? this.recommendedMovies.length : this.latestMovies.length) - this.visibleItems;
+    const maxIndex = (type === 'recommended' ? this.recommendedMovies.length : this.latestMovies.length) - this.getVisibleItems();
     const currentIndex = type === 'recommended' ? this.currentRecommendedIndex : this.currentLatestIndex;
     const newIndex = Math.max(0, Math.min(currentIndex + direction, maxIndex));
 
@@ -54,8 +54,23 @@ export class HomePageComponent {
     }
   }
 
+  getVisibleItems(): number {
+    switch (this.carouselItemWidth) {
+      case 'w-full':
+        return 1;
+      case 'w-1/2':
+        return 2;
+      case 'w-1/3':
+        return 3;
+      case 'w-1/4':
+        return 4;
+      default:
+        return 5;
+    }
+  }
+
   getTransformStyle(index: number) {
-    const translateValue = -index * (100 / this.visibleItems);
+    const translateValue = -index * 100;
     return `translateX(${translateValue}%)`;
   }
 }

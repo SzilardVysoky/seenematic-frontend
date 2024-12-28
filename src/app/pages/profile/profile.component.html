@@ -1,4 +1,5 @@
 <section class="profile-page max-w-screen-lg mx-auto my-8 p-6 bg-gray-100 rounded-lg">
+  <ng-container *ngIf="user; else errorTemplate">
     <!-- User Information -->
     <div class="profile-info flex items-center gap-4 mb-8">
       <img [src]="user.avatar" alt="User Avatar" class="w-24 h-24 rounded-full border border-gray-300" />
@@ -7,6 +8,12 @@
         <p class="text-gray-600">Email: {{ user.email }}</p>
       </div>
     </div>
+  </ng-container>
+
+  <!-- Error Message -->
+  <ng-template #errorTemplate>
+    <p class="text-red-500">{{ errorMessage }}</p>
+  </ng-template>
   
     <!-- Favorite Movies Section -->
     <div class="favorites mb-8">

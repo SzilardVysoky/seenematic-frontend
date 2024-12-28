@@ -1,20 +1,31 @@
-import { Component } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [NgFor], 
+  imports: [NgFor, NgIf], 
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent {
-  // Placeholder user information
-  user = {
-    username: 'SampleUser',
-    email: 'user@example.com',
-    avatar: 'assets/user-placeholder.jpg'
-  };
+export class ProfileComponent implements OnInit {
+  user: any = null; // Placeholder for user information
+  errorMessage: string | null = null;
+
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.authService.getProfile().subscribe({
+      next: (response) => {
+        this.user = response.user; // Set user information
+      },
+      error: (error) => {
+        this.errorMessage = error.error.message || 'Unable to fetch profile details';
+      },
+    });
+  }
+
 
   // Placeholder favorite movies
   favoriteMovies = [

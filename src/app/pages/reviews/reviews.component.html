@@ -1,8 +1,15 @@
-<div class="carousel-section mb-2">
-  <div class="text-center"> <!-- New wrapper for centering -->
-    <h2 class="text-2xl font-bold mt-2">List of All Movies</h2>
+<div class="carousel-section mb-2 mt-4">
+  <div class="text-center">
+    <!-- Updated Title Section -->
+    <h2 
+      class="text-2xl font-bold text-gray-50 text-center inline-block w-full max-w-screen-lg bg-gradient-to-r from-blue-500 to-gray-500 rounded-lg shadow-md py-2 px-4 border-b-4 border-blue-900"
+      style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+      List of All Movies
+    </h2>
   </div>
-<section class="search-filters max-w-screen-lg mx-auto my-2 p-4 bg-blue-100 rounded-lg shadow-md">
+  
+  <!-- Search Filters -->
+  <section class="search-filters max-w-screen-lg mx-auto my-2 p-4 bg-blue-100 rounded-lg shadow-md">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
       <input 
         type="text" 
@@ -26,7 +33,8 @@
       </select>
     </div>
   </section>
-  
+
+  <!-- Movies Container -->
   <div class="movies-container max-w-screen-lg mx-auto mb-6">
     <div class="movies-inner grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 bg-blue-100 rounded-lg">
       <div *ngFor="let movie of filteredMovies" class="movie-card flex-none bg-white rounded shadow-md p-1">
@@ -35,3 +43,5 @@
         <p class="text-sm text-gray-600">Rating: {{ movie.rating }}</p>
       </div>
     </div>
+  </div>
+</div>
