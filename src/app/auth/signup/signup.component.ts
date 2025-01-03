@@ -27,8 +27,8 @@ export class SignupComponent {
       next: (response) => {
         console.log('Registration successful', response);
         this.errorMessage = '';
-        alert('Registration successful! Redirecting to login page...'); 
-        this.router.navigate(['/login']);
+        alert('Registration successful! Please select your favorite genres.'); 
+        this.router.navigate(['/genre-selection']);
       },
       error: (error) => {
         console.error('Error during registration', error);

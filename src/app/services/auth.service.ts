@@ -50,4 +50,11 @@ export class AuthService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${this.baseUrl}/my-profile`, { headers });
   }
+  
+    // !!!new experimental for newly registered users
+    selectGenres(genres: string[]): Observable<any> {
+      const token = this.getToken();
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      return this.http.post(`${this.baseUrl}/select-genres`, { genres }, { headers });
+    }
 }
