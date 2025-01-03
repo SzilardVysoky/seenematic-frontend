@@ -20,7 +20,7 @@ export class SignupComponent {
   constructor(private http: HttpClient, private router: Router) {} // Inject HttpClient, Router
 
   onSignup() {
-    const url = 'http://localhost:5000/api/auth/register'; 
+    const url = 'https://seenematic-backend-production.up.railway.app/api/auth/register'; 
     const body = { name: this.username, email: this.email, password: this.password };
 
     this.http.post(url, body).subscribe({

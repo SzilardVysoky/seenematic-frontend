@@ -17,10 +17,12 @@ export class LoginComponent {
   password: string = '';
   errorMessage: string = ''; 
 
-  constructor(private http: HttpClient, private router: Router) {} // Inject HttpClient and Router
+  constructor(private http: HttpClient, 
+              private router: Router,
+              private authService: AuthService) {} // Inject HttpClient, Router, AuthService
 
   onLogin() {
-    const url = 'http://localhost:5000/api/auth/login'; 
+    const url = 'https://seenematic-backend-production.up.railway.app/api/auth/login'; 
     const body = { email: this.email, password: this.password };
 
     this.http.post(url, body).subscribe({
@@ -28,9 +30,9 @@ export class LoginComponent {
         console.log('Login successful', response);
         this.errorMessage = ''; 
 
-        localStorage.setItem('authToken', response.token);
+        this.authService.saveToken(response.token); // Save the token using AuthService
 
-        this.router.navigate(['/']);
+        this.router.navigate(['/']); // Redirect to homepage after login
       },
       error: (error) => {
         console.error('Error during login', error);
