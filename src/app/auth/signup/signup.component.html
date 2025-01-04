@@ -8,6 +8,7 @@
         class="w-full p-2 mb-4 rounded border border-gray-300 focus:outline-none focus:border-blue-500" 
         [(ngModel)]="username" 
         name="username"
+        placeholder="Enter your username (min 4 characters)"
         required
       />
       <label class="block mb-2">Email</label>
@@ -16,6 +17,7 @@
         class="w-full p-2 mb-4 rounded border border-gray-300 focus:outline-none focus:border-blue-500" 
         [(ngModel)]="email" 
         name="email"
+        placeholder="example@domain.com"
         required
       />
       <label class="block mb-2">Password</label>
@@ -24,6 +26,7 @@
         class="w-full p-2 mb-6 rounded border border-gray-300 focus:outline-none focus:border-blue-500" 
         [(ngModel)]="password" 
         name="password"
+        placeholder="Minimum 6 characters"
         required
       />
       <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded">Sign Up</button>
