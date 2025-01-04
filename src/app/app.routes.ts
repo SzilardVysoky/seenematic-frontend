@@ -9,6 +9,7 @@ import { ReviewsComponent } from './pages/reviews/reviews.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { GenreSelectionComponent } from './pages/genre-selection/genre-selection.component';
+import { GenreSelectionGuard } from './guards/genre-selection.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -19,7 +20,7 @@ export const routes: Routes = [
   { path: 'reviews', component: ReviewsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
-  { path: 'genre-selection', component: GenreSelectionComponent },
+  { path: 'genre-selection', component: GenreSelectionComponent, canActivate: [GenreSelectionGuard] },
   { path: '**', redirectTo: '' } // Redirect to home if the route doesn't exist
 ];
 

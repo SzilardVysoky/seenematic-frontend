@@ -26,12 +26,11 @@ export class GenreSelectionComponent {
       this.selectedGenres.push(genre); // Add the genre
     } else {
       this.errorMessage = 'You can only select up to 3 genres!';
-      setTimeout(() => (this.errorMessage = null), 5000); 
+      setTimeout(() => (this.errorMessage = null), 5000);
     }
   }
 
   submitGenres(): void {
-    // Validate genre selection
     if (this.selectedGenres.length < 2) {
       this.errorMessage = 'Please select at least 2 genres!';
       setTimeout(() => (this.errorMessage = null), 5000);
@@ -47,12 +46,12 @@ export class GenreSelectionComponent {
     // Proceed to submit genres
     this.authService.selectGenres(this.selectedGenres).subscribe({
       next: () => {
-        alert('Genres submitted successfully! Redirecting to login...');
-        this.router.navigate(['/login']);
+        alert('Genres submitted successfully! Redirecting to homepage...');
+        this.router.navigate(['/']);
       },
       error: (error) => {
         this.errorMessage = error.error.message || 'Unable to save genres. Please try again.';
-        setTimeout(() => (this.errorMessage = null), 5000); 
+        setTimeout(() => (this.errorMessage = null), 5000);
       }
     });
   }
