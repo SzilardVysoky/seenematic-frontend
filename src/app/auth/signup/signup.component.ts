@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -17,17 +18,23 @@ export class SignupComponent {
   password: string = '';
   errorMessage: string = ''; 
 
-  constructor(private http: HttpClient, private router: Router) {} // Inject HttpClient, Router
+  constructor(private http: HttpClient, private router: Router, private authService: AuthService) {} // Inject HttpClient, Router, AuthService
 
   onSignup() {
     const url = 'https://seenematic-backend-production.up.railway.app/api/auth/register'; 
     const body = { name: this.username, email: this.email, password: this.password };
 
     this.http.post(url, body).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         console.log('Registration successful', response);
         this.errorMessage = '';
-        alert('Registration successful! Please select your favorite genres.'); 
+
+        // Save token
+        if (response.token) {
+          this.authService.saveToken(response.token);
+        }
+
+        alert('Registration successful! Please select your favourite genres.'); 
         this.router.navigate(['/genre-selection']);
       },
       error: (error) => {

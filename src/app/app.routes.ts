@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SearchComponent } from './pages/search/search.component';
 import { ProfileComponent } from './pages/profile/profile.component';
-import { FavoritesComponent } from './pages/favorites/favorites.component';
+import { FavouritesComponent } from './pages/favourites/favourites.component';
 import { MovieDetailsComponent } from './pages/movie-details/movie-details.component';
 import { ReviewsComponent } from './pages/reviews/reviews.component';
 import { LoginComponent } from './auth/login/login.component';
@@ -14,7 +14,7 @@ export const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'search', component: SearchComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'favorites', component: FavoritesComponent },
+  { path: 'favorites', component: FavouritesComponent },
   { path: 'movie/:id', component: MovieDetailsComponent },
   { path: 'reviews', component: ReviewsComponent },
   { path: 'login', component: LoginComponent },

@@ -54,7 +54,9 @@ export class AuthService {
     // !!!new experimental for newly registered users
     selectGenres(genres: string[]): Observable<any> {
       const token = this.getToken();
+      if (!token) throw new Error('No token found');
+    
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      return this.http.post(`${this.baseUrl}/select-genres`, { genres }, { headers });
+      return this.http.post('http://localhost:5000/api/userRoutes/select-genres', { genres }, { headers });
     }
 }

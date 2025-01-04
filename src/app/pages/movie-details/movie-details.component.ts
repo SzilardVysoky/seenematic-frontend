@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-movie-details',
@@ -28,19 +29,31 @@ export class MovieDetailsComponent implements OnInit {
   newReviewContent: string = '';
   newReviewRating: number = 5;
   hoverRating: number | null = null;  // Holds the hovered rating temporarily
+  loggedInUserName: string | null = null;
 
   movieId: string | null = null;
 
-  constructor(private route: ActivatedRoute, public authService: AuthService) {}
+  constructor(private route: ActivatedRoute, public authService: AuthService, private http: HttpClient) {}
 
   ngOnInit() {
     this.movieId = this.route.snapshot.paramMap.get('id');
+
+    // Fetch the logged-in user's name
+    this.authService.getProfile().subscribe({
+      next: (response: any) => {
+        this.loggedInUserName = response.user.name;
+      },
+      error: (error) => {
+        console.error('Failed to fetch user profile', error);
+        this.loggedInUserName = null; 
+      }
+    });
   }
 
   submitReview() {
-    if (this.newReviewContent.trim()) {
+    if (this.newReviewContent.trim() && this.loggedInUserName) {
       const newReview = {
-        username: 'CurrentUser',
+        username: this.loggedInUserName, // Use logged-in user's name
         content: this.newReviewContent,
         rating: this.newReviewRating
       };
