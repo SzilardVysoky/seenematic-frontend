@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
+import { Filter } from 'bad-words';
 
 @Component({
   selector: 'app-movie-details',
@@ -28,39 +29,68 @@ export class MovieDetailsComponent implements OnInit {
 
   newReviewContent: string = '';
   newReviewRating: number = 5;
-  hoverRating: number | null = null;  // Holds the hovered rating temporarily
+  hoverRating: number | null = null;
   loggedInUserName: string | null = null;
-
+  errorMessage: string = '';
   movieId: string | null = null;
 
-  constructor(private route: ActivatedRoute, public authService: AuthService, private http: HttpClient) {}
+  private filter: Filter;
+
+  constructor(private route: ActivatedRoute, public authService: AuthService, private http: HttpClient) {
+    
+    this.filter = new Filter();
+    
+    this.filter.addWords(
+      'dumbass', 'idiot', 'moron', 'scumbag', 'jackass', 'loser',
+      'jerk', 'fuckboy', 'thot', 'wanker', 'bollocks', 'tosser',
+      'twat', 'arsehole', 'maggot', 'queer', 'dyke', 'sucker',
+      'bollock', 'crapper', 'rapist', 'chink', 'gypsy', 'nazi', 'fatass',
+      'f4ck'
+    );
+  }
 
   ngOnInit() {
     this.movieId = this.route.snapshot.paramMap.get('id');
 
     // Fetch the logged-in user's name
-    this.authService.getProfile().subscribe({
-      next: (response: any) => {
-        this.loggedInUserName = response.user.name;
-      },
-      error: (error) => {
-        console.error('Failed to fetch user profile', error);
-        this.loggedInUserName = null; 
-      }
-    });
+    if (this.authService.isAuthenticated()) {
+      this.authService.getProfile().subscribe({
+        next: (response: any) => {
+          this.loggedInUserName = response.user.name;
+        },
+        error: (error) => {
+          console.error('Failed to fetch user profile', error);
+          this.loggedInUserName = null;
+        }
+      });
+    }
   }
 
   submitReview() {
-    if (this.newReviewContent.trim() && this.loggedInUserName) {
-      const newReview = {
-        username: this.loggedInUserName, // Use logged-in user's name
-        content: this.newReviewContent,
-        rating: this.newReviewRating
-      };
-      this.reviews.push(newReview);
-      this.newReviewContent = '';
-      this.newReviewRating = 5;
+    if (!this.newReviewContent.trim()) {
+      this.errorMessage = 'Review content cannot be empty.';
+      return;
     }
+
+    const normalizedContent = this.newReviewContent.toLowerCase();
+    const bannedWords = this.filter.list; 
+    for (const word of bannedWords) {
+      if (normalizedContent.includes(word)) {
+        this.errorMessage = 'Your review contains inappropriate language.';
+        return;
+      }
+    }
+
+    const newReview = {
+      username: this.loggedInUserName || 'Guest', // Default 'Guest' if not logged in
+      content: this.newReviewContent,
+      rating: this.newReviewRating
+    };
+
+    this.reviews.push(newReview);
+    this.newReviewContent = '';
+    this.newReviewRating = 5;
+    this.errorMessage = ''; 
   }
 
   // Helper function to convert numeric rating to star symbols

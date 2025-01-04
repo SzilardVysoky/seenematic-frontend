@@ -25,6 +25,9 @@
     <ng-container *ngIf="authService.isAuthenticated(); else loginPrompt">
       <textarea [(ngModel)]="newReviewContent" rows="3" class="w-full p-2 border border-gray-300 rounded mb-4" placeholder="Write your review here..."></textarea>
 
+      <!-- Display error messages -->
+    <p *ngIf="errorMessage" class="text-red-500 mb-2">{{ errorMessage }}</p>
+    
       <!-- Star Rating Selection with CSS-based Stars -->
 <div class="star-rating mb-4">
   <span *ngFor="let star of [1, 2, 3, 4, 5]"

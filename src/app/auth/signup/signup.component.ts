@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { Filter } from 'bad-words';
 
 @Component({
   selector: 'app-signup',
@@ -16,11 +17,29 @@ export class SignupComponent {
   username: string = '';
   email: string = '';
   password: string = '';
-  errorMessage: string = ''; 
+  errorMessage: string = '';
+  private filter: Filter;
+ 
 
-  constructor(private http: HttpClient, private router: Router, private authService: AuthService) {} // Inject HttpClient, Router, AuthService
+  constructor(private http: HttpClient, private router: Router, private authService: AuthService) {
+    
+    this.filter = new Filter(); 
+    
+    this.filter.addWords(
+      'dumbass', 'idiot', 'moron', 'scumbag', 'jackass', 'loser',
+      'jerk', 'fuckboy', 'thot', 'wanker', 'bollocks', 'tosser',
+      'twat', 'arsehole', 'maggot', 'queer', 'dyke', 'sucker',
+      'bollock', 'crapper', 'rapist', 'chink', 'gypsy', 'nazi', 'fatass',
+      'f4ck'
+    );
+  }
 
   validateInput(): boolean {
+    if (!this.username.trim()) {
+      this.errorMessage = 'Please add a username.';
+      return false;
+    }
+
     if (!this.username.trim()) {
       this.errorMessage = 'Please add a username.';
       return false;
@@ -29,6 +48,15 @@ export class SignupComponent {
     if (this.username.trim().length < 4) {
       this.errorMessage = 'Username must be at least 4 characters long.';
       return false;
+    }
+
+    const normalizedUsername = this.username.toLowerCase();
+    const bannedWords = this.filter.list;
+    for (const word of bannedWords) {
+      if (normalizedUsername.includes(word)) {
+        this.errorMessage = 'Username contains inappropriate content.';
+        return false;
+      }
     }
 
     if (!this.email.trim()) {
