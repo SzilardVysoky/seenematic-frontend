@@ -52,6 +52,12 @@ export class SignupComponent {
       return false;
     }
 
+    const passwordComplexityRegex = /(?=.*[A-Z])|(?=.*\d)/;
+    if (!passwordComplexityRegex.test(this.password)) {
+      this.errorMessage = 'Password must have at least one uppercase letter or a number.';
+      return false;
+    }
+
     this.errorMessage = ''; 
     return true;
   }
