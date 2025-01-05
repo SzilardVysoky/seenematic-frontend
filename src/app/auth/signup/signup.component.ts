@@ -40,13 +40,8 @@ export class SignupComponent {
       return false;
     }
 
-    if (!this.username.trim()) {
-      this.errorMessage = 'Please add a username.';
-      return false;
-    }
-
-    if (this.username.trim().length < 4) {
-      this.errorMessage = 'Username must be at least 4 characters long.';
+    if (this.username.trim().length < 3 || this.username.trim().length > 20) {
+      this.errorMessage = 'Username must be between 3 and 20 characters long.';
       return false;
     }
 
@@ -75,14 +70,14 @@ export class SignupComponent {
       return false;
     }
 
-    if (this.password.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters long.';
+    if (this.password.length < 9) {
+      this.errorMessage = 'Password must be at least 9 characters long.';
       return false;
     }
 
-    const passwordComplexityRegex = /(?=.*[A-Z])|(?=.*\d)/;
+    const passwordComplexityRegex = /^(?=.*[A-Z])(?=.*\d)/;
     if (!passwordComplexityRegex.test(this.password)) {
-      this.errorMessage = 'Password must have at least one uppercase letter or a number.';
+      this.errorMessage = 'Password must have at least one uppercase letter and one number.';
       return false;
     }
 
@@ -101,7 +96,6 @@ export class SignupComponent {
 
     this.http.post(url, body).subscribe({
       next: (response: any) => {
-        console.log('Registration successful', response);
         this.errorMessage = '';
 
         // Save token

@@ -31,6 +31,7 @@ export class GenreSelectionComponent {
   }
 
   submitGenres(): void {
+    //Validate genre selection
     if (this.selectedGenres.length < 2) {
       this.errorMessage = 'Please select at least 2 genres!';
       setTimeout(() => (this.errorMessage = null), 5000);

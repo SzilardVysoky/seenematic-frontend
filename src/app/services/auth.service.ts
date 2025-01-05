@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -44,19 +44,20 @@ export class AuthService {
   getProfile(): Observable<any> {
     const token = this.getToken();
     if (!token) {
-      throw new Error('No token found');
+      return of(null);
+      // throw new Error('No token found');
     }
 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get(`${this.baseUrl}/my-profile`, { headers });
   }
   
-    // !!!new experimental for newly registered users
+    // !ONLY! Newly registered users must choose min 2 or max 3 genres they are interested in
     selectGenres(genres: string[]): Observable<any> {
       const token = this.getToken();
       if (!token) throw new Error('No token found');
     
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      return this.http.post('http://localhost:5000/api/userRoutes/select-genres', { genres }, { headers });
+      return this.http.post('https://seenematic-backend-production.up.railway.app/api/userRoutes/select-genres', { genres }, { headers });
     }
 }

@@ -10,11 +10,12 @@ import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { GenreSelectionComponent } from './pages/genre-selection/genre-selection.component';
 import { GenreSelectionGuard } from './guards/genre-selection.guard';
+import { ProfileGuard } from './guards/profile.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'search', component: SearchComponent },
-  { path: 'profile', component: ProfileComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [ProfileGuard] },
   { path: 'favorites', component: FavouritesComponent },
   { path: 'movie/:id', component: MovieDetailsComponent },
   { path: 'reviews', component: ReviewsComponent },
