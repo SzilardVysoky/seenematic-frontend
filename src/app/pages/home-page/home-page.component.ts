@@ -1,26 +1,37 @@
-import { NgFor, NgStyle, NgClass } from '@angular/common';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
+import { NgFor, NgStyle, NgClass, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [NgFor, NgStyle, NgClass, FormsModule, RouterModule],
+  imports: [NgFor, NgStyle, NgClass, CommonModule, FormsModule, RouterModule],
   templateUrl: './home-page.component.html',
   styleUrls: []
 })
-export class HomePageComponent {
-  recommendedMovies = Array(10).fill({ title: 'Recommended Movie', rating: '⭐⭐⭐⭐', image: 'assets/movie-placeholder.jpg' });
-  latestMovies = Array(10).fill({ title: 'Latest Movie', genre: 'Action', rating: '⭐⭐⭐⭐', image: 'assets/movie-placeholder.jpg' });
-
-  currentRecommendedIndex = 0;
+export class HomePageComponent implements OnInit {
+  trendingMovies: any[] = [];
+  latestMovies: any[] = [];
+  currentTrendingIndex = 0;
   currentLatestIndex = 0;
-
   carouselItemWidth = 'lg:w-1/4'; // Default width for 4 items
+  isLoggedIn: boolean = false;
 
-  constructor() {
+  constructor(private authService: AuthService, private http: HttpClient) {
     this.updateCarouselItemWidth(window.innerWidth);
+  }
+
+  ngOnInit(): void {
+    this.isLoggedIn = this.authService.isAuthenticated();
+
+    if (!this.isLoggedIn) {
+      this.fetchTrendingMovies();
+    }
+
+    this.fetchLatestMovies(1); // Start with page 1
   }
 
   @HostListener('window:resize', ['$event'])
@@ -43,14 +54,34 @@ export class HomePageComponent {
   }
 
   moveCarousel(type: string, direction: number) {
-    const maxIndex = (type === 'recommended' ? this.recommendedMovies.length : this.latestMovies.length) - this.getVisibleItems();
-    const currentIndex = type === 'recommended' ? this.currentRecommendedIndex : this.currentLatestIndex;
-    const newIndex = Math.max(0, Math.min(currentIndex + direction, maxIndex));
-
-    if (type === 'recommended') {
-      this.currentRecommendedIndex = newIndex;
-    } else {
-      this.currentLatestIndex = newIndex;
+    const movies = type === 'trending' ? this.trendingMovies : this.latestMovies;
+    const currentIndex = type === 'trending' ? this.currentTrendingIndex : this.currentLatestIndex;
+    const maxIndex = Math.ceil(movies.length / this.getVisibleItems()) - 1;
+  
+    if (direction > 0) { // Moving forward
+      const newIndex = currentIndex + 1;
+      if (newIndex > maxIndex) {
+        // If it's the last slide, loop back to the beginning
+        if (type === 'trending') {
+          this.currentTrendingIndex = 0;
+        } else {
+          this.currentLatestIndex = 0;
+        }
+      } else {
+        // Move to the next slide
+        if (type === 'trending') {
+          this.currentTrendingIndex = newIndex;
+        } else {
+          this.currentLatestIndex = newIndex;
+        }
+      }
+    } else { // Moving backward (Previous button)
+      const newIndex = Math.max(0, currentIndex - 1);
+      if (type === 'trending') {
+        this.currentTrendingIndex = newIndex;
+      } else {
+        this.currentLatestIndex = newIndex;
+      }
     }
   }
 
@@ -72,5 +103,44 @@ export class HomePageComponent {
   getTransformStyle(index: number) {
     const translateValue = -index * 100;
     return `translateX(${translateValue}%)`;
+  }
+
+  fetchTrendingMovies(): void {
+    const url = 'https://seenematic-backend-production.up.railway.app/api/tmdb/trending';
+    this.http.get<any[]>(url).subscribe({
+      next: (response) => {
+        this.trendingMovies = response.map((movie) => ({
+          title: movie.title,
+          rating: Math.round(movie.vote_average * 10), // Convert TMDB rating to percentage
+          image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          id: movie.id,
+        }));
+      },
+      error: (error) => {
+        console.error('Error fetching trending movies:', error);
+        this.trendingMovies = []; // Default to an empty array
+      },
+    });
+  }
+  
+  fetchLatestMovies(page: number): void {
+    const url = `https://seenematic-backend-production.up.railway.app/api/tmdb/latest?page=${page}`;
+    this.http.get<any[]>(url).subscribe({
+      next: (response) => {
+        this.latestMovies = [
+          ...this.latestMovies,
+          ...response.map((movie) => ({
+            title: movie.title,
+            rating: Math.round(movie.vote_average * 10), // Convert TMDB rating to percentage
+            image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            id: movie.id,
+          })),
+        ];
+      },
+      error: (error) => {
+        console.error('Error fetching latest movies:', error);
+        this.latestMovies = []; // Default to an empty array
+      },
+    });
   }
 }

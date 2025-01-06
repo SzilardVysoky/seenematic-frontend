@@ -1,49 +1,56 @@
-<!-- Section for Recommended Movies Carousel -->
-<div class="mt-4">
-  <div class="text-center mb-4">
-    <h2
-      class="text-2xl font-bold text-gray-50 text-center inline-block w-full max-w-screen-lg bg-gradient-to-r from-blue-500 to-gray-500 rounded-lg shadow-md py-2 px-4 border-b-4 border-blue-900"
-      style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);"
-    >
-      Recommended Movies
-    </h2>
-  </div>
-  <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
-    <!-- Previous Button -->
-    <button 
-      class="absolute left-2 top-1/3 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full hover:bg-gray-900 z-10"
-      (click)="moveCarousel('recommended', -1)">
-      &#10094;
-    </button>
-    <!-- Carousel Items -->
-    <div 
-      class="flex transition-transform duration-300 ease-in-out" 
-      [ngStyle]="{ 'transform': getTransformStyle(currentRecommendedIndex) }">
-      <div 
-        *ngFor="let movie of recommendedMovies" 
-        class="flex-shrink-0 p-4"
-        [ngClass]="carouselItemWidth">
-        <img [src]="'movie.jpg'" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover bg-white rounded-lg shadow-lg mb-2" />
-        <h3 class="text-lg font-semibold">{{ movie.title }}</h3>
-        <p class="text-sm text-gray-600">Rating: {{ movie.rating }}</p>
-        <button 
-          class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700" 
-          [routerLink]="['/movie', movie.id]">
-          More Info
-        </button>
-      </div>
+<div class="home-page-container">
+  <!-- Trending Movies Section (Only for Guests) -->
+  <section *ngIf="!isLoggedIn" class="mt-4">
+    <div class="text-center mb-4">
+      <h2
+        class="text-2xl font-bold text-gray-50 text-center inline-block w-full max-w-screen-lg bg-gradient-to-r from-blue-500 to-gray-500 rounded-lg shadow-md py-2 px-4 border-b-4 border-blue-900"
+        style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);"
+      >
+        Trending Movies
+      </h2>
     </div>
-    <!-- Next Button -->
-    <button 
-      class="absolute right-2 top-1/3 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full hover:bg-gray-900 z-10"
-      (click)="moveCarousel('recommended', 1)">
-      &#10095;
-    </button>
-  </div>
-</div>
+    <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
+      <!-- Previous Button -->
+      <button 
+        class="absolute left-2 top-1/3 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full hover:bg-gray-900 z-10"
+        (click)="moveCarousel('trending', -1)">
+        &#10094;
+      </button>
+      <!-- Carousel Items -->
+      <div 
+        class="flex transition-transform duration-300 ease-in-out" 
+        [ngStyle]="{ 'transform': getTransformStyle(currentTrendingIndex) }">
+        <div 
+          *ngFor="let movie of trendingMovies" 
+          class="flex-shrink-0 p-4"
+          [ngClass]="carouselItemWidth">
+          <div class="bg-white rounded-lg shadow-lg h-full flex flex-col justify-between">
+            <img [src]="movie.image" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover rounded mb-2" />
+            <div class="flex flex-col justify-center items-center h-full">
+              <h3 class="text-lg font-semibold text-center">{{ movie.title }}</h3>
+            </div>
+            <div class="mt-auto">
+              <p class="text-sm text-gray-600 text-center">Rating: {{ movie.rating }}%</p>
+              <button 
+                class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 w-full" 
+                [routerLink]="['/movie', movie.id]">
+                More Info
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Next Button -->
+      <button 
+        class="absolute right-2 top-1/3 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full hover:bg-gray-900 z-10"
+        (click)="moveCarousel('trending', 1)">
+        &#10095;
+      </button>
+    </div>
+  </section>
 
-<!-- Section for Latest Movies Carousel -->
-<div class="mb-4 mt-4">
+  <!-- Latest Movies Section -->
+<section class="mb-4 mt-4">
   <div class="text-center mb-4">
     <h2
       class="text-2xl font-bold text-gray-50 text-center inline-block w-full max-w-screen-lg bg-gradient-to-r from-blue-500 to-gray-500 rounded-lg shadow-md py-2 px-4 border-b-4 border-blue-900"
@@ -67,14 +74,20 @@
         *ngFor="let movie of latestMovies" 
         class="flex-shrink-0 p-4"
         [ngClass]="carouselItemWidth">
-        <img [src]="'movie.jpg'" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover bg-white rounded-lg shadow-lg mb-2" />
-        <h3 class="text-lg font-semibold">{{ movie.title }}</h3>
-        <p class="text-sm text-gray-600">Rating: {{ movie.rating }}</p>
-        <button 
-          class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700" 
-          [routerLink]="['/movie', movie.id]">
-          More Info
-        </button>
+        <div class="bg-white rounded-lg shadow-lg h-full flex flex-col justify-between">
+          <img [src]="movie.image" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover rounded mb-2" />
+          <div class="flex flex-col justify-center items-center h-full">
+            <h3 class="text-lg font-semibold text-center">{{ movie.title }}</h3>
+          </div>
+          <div class="mt-auto">
+            <p class="text-sm text-gray-600 text-center">Rating: {{ movie.rating }}%</p>
+            <button 
+              class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 w-full" 
+              [routerLink]="['/movie', movie.id]">
+              More Info
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Next Button -->
@@ -84,4 +97,4 @@
       &#10095;
     </button>
   </div>
-</div>
+</section>
