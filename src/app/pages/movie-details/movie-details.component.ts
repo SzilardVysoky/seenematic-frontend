@@ -1,26 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NgIf, NgFor, NgClass } from '@angular/common';
+import { NgIf, NgFor, NgClass, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { Filter } from 'bad-words';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; // Added DomSanitizer
 
 @Component({
   selector: 'app-movie-details',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, FormsModule, RouterModule],
+  imports: [NgIf, NgFor, NgClass, CommonModule, FormsModule, RouterModule],
   templateUrl: './movie-details.component.html',
   styleUrls: ['./movie-details.component.css']
 })
 export class MovieDetailsComponent implements OnInit {
-  movie = {
-    title: 'Sample Movie Title',
-    rating: '⭐⭐⭐⭐',
-    description: 'This is a detailed description of the movie, including its plot, genre, and other details.',
-    image: 'assets/movie-placeholder.jpg'
-  };
+  movie: any = null; // Movie details from API
 
   reviews = [
     { username: 'User1', content: 'This movie was fantastic! I loved the storyline and the acting was incredible.', rating: 4 },
@@ -33,10 +29,15 @@ export class MovieDetailsComponent implements OnInit {
   loggedInUserName: string | null = null;
   errorMessage: string = '';
   movieId: string | null = null;
+  trailerUrl: SafeResourceUrl | null = null; // Use SafeResourceUrl for sanitized URLs
+  showTrailerModal: boolean = false; // Control trailer modal visibility
 
   private filter: Filter;
 
-  constructor(private route: ActivatedRoute, public authService: AuthService, private http: HttpClient) {
+  constructor(private route: ActivatedRoute,
+     public authService: AuthService,
+      private http: HttpClient,
+      private sanitizer: DomSanitizer) {
     
     this.filter = new Filter();
     
@@ -51,6 +52,10 @@ export class MovieDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.movieId = this.route.snapshot.paramMap.get('id');
+    if (this.movieId) {
+      this.fetchMovieDetails(this.movieId);
+      this.fetchMovieTrailer(this.movieId); // Fetch trailer info
+    }
 
     // Fetch the logged-in user's name
     if (this.authService.isAuthenticated()) {
@@ -64,6 +69,43 @@ export class MovieDetailsComponent implements OnInit {
         }
       });
     }
+  }
+
+  fetchMovieDetails(movieId: string): void {
+    const url = `https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}`;
+    this.http.get(url).subscribe({
+      next: (response) => {
+        this.movie = response;
+      },
+      error: (error) => {
+        console.error('Error fetching movie details:', error);
+      }
+    });
+  }
+
+  fetchMovieTrailer(movieId: string): void {
+    const url = `https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}/trailers`;
+    this.http.get(url).subscribe({
+      next: (response: any) => {
+        if (Array.isArray(response)) {
+          const trailer = response.find(
+            (video: any) => video.type === 'Trailer' && video.site === 'YouTube'
+          );
+
+          if (trailer) {
+            const unsafeUrl = `https://www.youtube.com/embed/${trailer.key}`;
+            this.trailerUrl = this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl);
+          } else {
+            this.trailerUrl = null;
+          }
+        } else {
+          this.trailerUrl = null;
+        }
+      },
+      error: () => {
+        this.trailerUrl = null;
+      }
+    });
   }
 
   submitReview() {

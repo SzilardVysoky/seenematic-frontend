@@ -68,7 +68,7 @@ export class HomePageComponent implements OnInit {
           this.currentLatestIndex = 0;
         }
       } else {
-        // Move to the next slide
+        // Next slide
         if (type === 'trending') {
           this.currentTrendingIndex = newIndex;
         } else {
@@ -118,7 +118,7 @@ export class HomePageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching trending movies:', error);
-        this.trendingMovies = []; // Default to an empty array
+        this.trendingMovies = [];
       },
     });
   }
