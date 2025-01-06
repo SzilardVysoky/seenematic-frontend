@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf, NgFor, NgClass, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -35,7 +35,8 @@ export class MovieDetailsComponent implements OnInit {
   private filter: Filter;
 
   constructor(private route: ActivatedRoute,
-     public authService: AuthService,
+      private router: Router,
+      public authService: AuthService,
       private http: HttpClient,
       private sanitizer: DomSanitizer) {
     
@@ -54,7 +55,7 @@ export class MovieDetailsComponent implements OnInit {
     this.movieId = this.route.snapshot.paramMap.get('id');
     if (this.movieId) {
       this.fetchMovieDetails(this.movieId);
-      this.fetchMovieTrailer(this.movieId); // Fetch trailer info
+      this.fetchMovieTrailer(this.movieId);
     }
 
     // Fetch the logged-in user's name
@@ -106,6 +107,12 @@ export class MovieDetailsComponent implements OnInit {
         this.trailerUrl = null;
       }
     });
+  }
+
+  // Redirect to login and return to the previous page where we tried to leave a comment
+  redirectAfterTryingToCommentAsGuest(): void {
+    const currentUrl = this.router.url; 
+    this.router.navigate(['/login'], { queryParams: { returnUrl: currentUrl } });
   }
 
   submitReview() {

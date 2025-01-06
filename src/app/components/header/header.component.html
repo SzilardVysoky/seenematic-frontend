@@ -7,10 +7,10 @@
   <div>
     <!-- Show logout button if logged in, login button if logged out -->
     <ng-container *ngIf="authService.isAuthenticated(); else login">
-      <button class="bg-white text-blue-600 px-4 py-2 rounded" (click)="onLogout()">Logout</button>
+      <button class="px-4 py-2 text-sm font-medium uppercase tracking-wider bg-white text-blue-600 hover:bg-gray-800 hover:text-white active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="onLogout()">Logout</button>
     </ng-container>
     <ng-template #login>
-      <button class="bg-white text-blue-600 px-4 py-2 ml-6 rounded" (click)="onLogin()">Login / Signup</button>
+      <button class="px-4 py-2 text-sm font-medium uppercase tracking-wider bg-white text-blue-600 hover:bg-gray-800 hover:text-white active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 ml-6" (click)="onLogin()">Login / Signup</button>
     </ng-template>
   </div>
 </header>

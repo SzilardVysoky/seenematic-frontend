@@ -1,5 +1,24 @@
-<nav class="flex justify-center bg-gray-800 text-white py-2">
-    <a routerLink="/" class="px-4 py-2 hover:bg-gray-700 rounded">Home</a>
-    <a routerLink="/reviews" class="px-4 py-2 hover:bg-gray-700 rounded">All Movies</a>
-    <a *ngIf="authService.isAuthenticated()" routerLink="/profile" class="px-4 py-2 hover:bg-gray-700 rounded">Profile</a>    <a routerLink="/search" class="px-4 py-2 hover:bg-gray-700 rounded">Search</a>
+<nav class="flex justify-center bg-gray-800 text-white py-3 shadow-lg">
+  <a
+    routerLink="/"
+    class="px-6 py-2 mx-2 text-sm font-medium uppercase tracking-wider bg-blue-600 hover:bg-white hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+    [ngClass]="{ 'bg-blue-700': isActive('/') }"
+  >
+    Home
+  </a>
+  <a
+    routerLink="/reviews"
+    class="px-6 py-2 mx-2 text-sm font-medium uppercase tracking-wider bg-blue-600 hover:bg-white hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+    [ngClass]="{ 'bg-blue-700': isActive('/reviews') }"
+  >
+    All Movies
+  </a>
+  <a
+    *ngIf="authService.isAuthenticated()"
+    routerLink="/profile"
+    class="px-6 py-2 mx-2 text-sm font-medium uppercase tracking-wider bg-blue-600 hover:bg-white hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+    [ngClass]="{ 'bg-blue-700': isActive('/profile') }"
+  >
+    Profile
+  </a>
 </nav>
