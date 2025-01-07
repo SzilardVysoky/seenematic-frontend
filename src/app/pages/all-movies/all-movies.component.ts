@@ -3,13 +3,13 @@ import { NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-reviews',
+  selector: 'app-all-movies',
   standalone: true,
   imports: [NgFor, FormsModule],
-  templateUrl: './reviews.component.html',
-  styleUrls: ['./reviews.component.css']
+  templateUrl: './all-movies.component.html',
+  styleUrls: ['./all-movies.component.css']
 })
-export class ReviewsComponent {
+export class AllMoviesComponent {
   searchQuery: string = '';
   selectedGenre: string = '';
   selectedRating: string = '';

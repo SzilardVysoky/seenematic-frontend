@@ -5,7 +5,7 @@ import { SearchComponent } from './pages/search/search.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FavouritesComponent } from './pages/favourites/favourites.component';
 import { MovieDetailsComponent } from './pages/movie-details/movie-details.component';
-import { ReviewsComponent } from './pages/reviews/reviews.component';
+import { AllMoviesComponent } from './pages/all-movies/all-movies.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { GenreSelectionComponent } from './pages/genre-selection/genre-selection.component';
@@ -18,7 +18,7 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [ProfileGuard] },
   { path: 'favorites', component: FavouritesComponent },
   { path: 'movie/:id', component: MovieDetailsComponent },
-  { path: 'reviews', component: ReviewsComponent },
+  { path: 'all-movies', component: AllMoviesComponent },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'genre-selection', component: GenreSelectionComponent, canActivate: [GenreSelectionGuard] },
