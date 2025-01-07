@@ -27,7 +27,18 @@
           <div class="bg-white rounded-lg shadow-lg h-full flex flex-col justify-between">
             <img [src]="movie.image" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover rounded mb-2" />
             <div class="flex flex-col justify-center items-center h-full">
-              <h3 class="text-lg font-semibold text-center">{{ movie.title }}</h3>
+              <!-- Movie Title Text Size If Too Long -->
+              <h3 
+                class="text-lg font-semibold text-center" 
+                [ngClass]="{
+                  'text-lg': movie.title.length <= 25,
+                  'text-base': movie.title.length > 25 && movie.title.length <= 30,
+                  'text-sm': movie.title.length > 30 && movie.title.length <= 35,
+                  'text-xs': movie.title.length > 35
+                }"
+              >
+                {{ movie.title }}
+              </h3>
             </div>
             <div class="mt-auto">
               <!-- Rating Display -->
@@ -114,7 +125,18 @@
           <div class="bg-white rounded-lg shadow-lg h-full flex flex-col justify-between">
             <img [src]="movie.image" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover rounded mb-2" />
             <div class="flex flex-col justify-center items-center h-full">
-              <h3 class="text-lg font-semibold text-center">{{ movie.title }}</h3>
+              <!-- Movie Title Text Size If Too Long -->
+              <h3 
+                class="text-lg font-semibold text-center" 
+                [ngClass]="{
+                  'text-lg': movie.title.length <= 25,
+                  'text-base': movie.title.length > 25 && movie.title.length <= 30,
+                  'text-sm': movie.title.length > 30 && movie.title.length <= 35,
+                  'text-xs': movie.title.length > 35
+                }"
+              >
+                {{ movie.title }}
+              </h3>
             </div>
             <div class="mt-auto">
               <!-- Rating Display -->
@@ -203,7 +225,18 @@
           <div class="bg-white rounded-lg shadow-lg h-full flex flex-col justify-between">
             <img [src]="movie.image" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover rounded mb-2" />
             <div class="flex flex-col justify-center items-center h-full">
-              <h3 class="text-lg font-semibold text-center">{{ movie.title }}</h3>
+              <!-- Movie Title Text Size If Too Long -->
+              <h3 
+                class="text-lg font-semibold text-center" 
+                [ngClass]="{
+                  'text-lg': movie.title.length <= 25,
+                  'text-base': movie.title.length > 25 && movie.title.length <= 30,
+                  'text-sm': movie.title.length > 30 && movie.title.length <= 35,
+                  'text-xs': movie.title.length > 35
+                }"
+              >
+                {{ movie.title }}
+              </h3>
             </div>
             <div class="mt-auto">
               <!-- Rating Display -->

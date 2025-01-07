@@ -1,47 +1,143 @@
-<div class="carousel-section mb-2 mt-4">
-  <div class="text-center">
-    <!-- Updated Title Section -->
-    <h2 
-      class="text-2xl font-bold text-gray-50 text-center inline-block w-full max-w-screen-lg bg-gradient-to-r from-blue-500 to-gray-500 rounded-lg shadow-md py-2 px-4 border-b-4 border-blue-900"
-      style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
-      List of All Movies
-    </h2>
-  </div>
-  
-  <!-- Search Filters -->
-  <section class="search-filters max-w-screen-lg mx-auto my-2 p-4 bg-blue-100 rounded-lg shadow-md">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-      <input 
-        type="text" 
-        placeholder="Search for movies..." 
-        class="w-full sm:w-1/2 p-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
-        [(ngModel)]="searchQuery"
-      />
-      <select 
-        class="w-full sm:w-1/4 p-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
-        [(ngModel)]="selectedGenre"
+<div class="all-movies-container">
+  <!-- All Movies Section -->
+  <section class="mt-4">
+    <div class="text-center mb-4">
+      <h2
+        class="text-2xl font-bold text-gray-50 text-center inline-block w-full max-w-screen-lg bg-gradient-to-r from-blue-500 to-gray-500 rounded-lg shadow-md py-2 px-4 border-b-4 border-blue-900"
+        style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);"
       >
-        <option value="">All Genres</option>
-        <option *ngFor="let genre of genres" [value]="genre">{{ genre }}</option>
-      </select>
-      <select 
-        class="w-full sm:w-1/4 p-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
-        [(ngModel)]="selectedRating"
-      >
-        <option value="">All Ratings</option>
-        <option *ngFor="let rating of ratings" [value]="rating">{{ rating }}</option>
-      </select>
+        List of All Movies
+      </h2>
     </div>
-  </section>
 
-  <!-- Movies Container -->
-  <div class="movies-container max-w-screen-lg mx-auto mb-6">
-    <div class="movies-inner grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 bg-blue-100 rounded-lg">
-      <div *ngFor="let movie of filteredMovies" class="movie-card flex-none bg-white rounded shadow-md p-1">
-        <img [src]="'movie.jpg'" alt="Movie Thumbnail" class="w-64 h-64 object-contain rounded" />        
-        <h3 class="text-lg font-semibold mt-2">{{ movie.title }}</h3>
-        <p class="text-sm text-gray-600">Rating: {{ movie.rating }}</p>
+    <!-- Search Filters -->
+    <section class="search-filters max-w-screen-lg mx-auto my-2 p-6 bg-white rounded-lg shadow-lg border border-gray-200">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+        <!-- Search Input -->
+        <div class="relative w-full sm:w-1/2">
+          <label for="search" class="block text-gray-600 text-sm font-medium mb-1">Search for movies</label>
+          <div class="relative">
+            <input
+              id="search"
+              type="text"
+              placeholder="Type to search..."
+              class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-700 shadow-sm"
+              [(ngModel)]="searchQuery"
+              (input)="searchMovies()"
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l-4-4m0 0l4-4m-4 4h16" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Genre Dropdown -->
+        <div class="relative w-full sm:w-1/4">
+          <label for="genre" class="block text-gray-600 text-sm font-medium mb-1">Filter by Genre</label>
+          <select
+            id="genre"
+            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-700 shadow-sm"
+            [(ngModel)]="selectedGenre"
+            (change)="onGenreChange()"
+          >
+            <option value="">All Genres</option>
+            <option *ngFor="let genre of genres" [value]="genre.id">{{ genre.name }}</option>
+          </select>
+        </div>
+
+        <!-- Sort Dropdown -->
+        <div class="relative w-full sm:w-1/4">
+          <label for="sort" class="block text-gray-600 text-sm font-medium mb-1">Sort By</label>
+          <select
+            id="sort"
+            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-700 shadow-sm"
+            [(ngModel)]="selectedSort"
+            (change)="onSortChange()"
+          >
+            <option value="">Sort By</option>
+            <option *ngFor="let sortOption of sortOptions" [value]="sortOption.value">{{ sortOption.label }}</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Movies Container -->
+    <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
+      <div class="movies-inner grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+        <div *ngFor="let movie of movies" class="flex-shrink-0 p-4">
+          <div class="bg-white rounded-lg shadow-lg h-full flex flex-col justify-between">
+            <img [src]="movie.image || 'assets/movie-placeholder.jpg'" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover rounded mb-2" />
+            <div class="flex flex-col justify-center items-center h-full">
+              <!-- Movie Title Text Size If Too Long -->
+              <h3 
+                class="text-lg font-semibold text-center" 
+                [ngClass]="{
+                  'text-lg': movie.title.length <= 25,
+                  'text-base': movie.title.length > 25 && movie.title.length <= 30,
+                  'text-sm': movie.title.length > 30 && movie.title.length <= 35,
+                  'text-xs': movie.title.length > 35
+                }"
+              >
+                {{ movie.title }}
+              </h3>
+            </div>
+            <div class="mt-auto">
+              <!-- Rating Display -->
+              <div class="flex items-center justify-center">
+                <div class="relative w-12 h-12">
+                  <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 36 36">
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="15.9155"
+                      class="text-gray-200"
+                      stroke="currentColor"
+                      stroke-width="3.5"
+                      fill="none"
+                    ></circle>
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="15.9155"
+                      [attr.stroke-dasharray]="movie.rating + ', 100'"
+                      [class]="
+                        movie.rating > 85 ? 'text-green-300' :
+                        movie.rating > 80 ? 'text-green-500' :
+                        movie.rating > 75 ? 'text-yellow-300' :
+                        movie.rating > 70 ? 'text-yellow-500' :
+                        movie.rating > 60 ? 'text-orange-400' :
+                        movie.rating > 50 ? 'text-red-400' :
+                                            'text-red-600'"
+                      stroke="currentColor"
+                      stroke-width="3.5"
+                      stroke-linecap="round"
+                      fill="none"
+                    ></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-800">
+                    {{ movie.rating }}<span class="text-[10px]">%</span>
+                  </div>
+                </div>
+                <p class="ml-3 text-sm text-gray-700 font-semibold">Rating</p>
+              </div>
+              <button 
+                class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-gray-300 hover:text-blue-600 hover:scale-105 active:bg-blue-800 shadow-md transition-all duration-300 transform focus:outline-none focus:ring-4 focus:ring-blue-200 w-full"  
+                [routerLink]="['/movie', movie.id]">
+                More Info
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load More Button -->
+      <div class="flex justify-center mt-4">
+        <button 
+          class="px-6 py-2 text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+          (click)="loadMoreMovies()">
+          Load More
+        </button>
       </div>
     </div>
-  </div>
+  </section>
 </div>
