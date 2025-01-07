@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { NgFor, NgIf, NgClass } from '@angular/common';
+import { NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-all-movies',
   standalone: true,
-  imports: [NgFor, NgIf, NgClass, FormsModule, RouterModule],
+  imports: [NgFor, NgClass, FormsModule, RouterModule],
   templateUrl: './all-movies.component.html',
   styleUrls: ['./all-movies.component.css']
 })
