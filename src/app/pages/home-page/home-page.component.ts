@@ -15,8 +15,12 @@ import { RouterModule } from '@angular/router';
 export class HomePageComponent implements OnInit {
   trendingMovies: any[] = [];
   latestMovies: any[] = [];
+  recommendedMovies: any[] = [];
+
   currentTrendingIndex = 0;
   currentLatestIndex = 0;
+  currentRecommendedIndex = 0;
+
   carouselItemWidth = 'lg:w-1/4'; // Default width for 4 items
   isLoggedIn: boolean = false;
 
@@ -27,7 +31,9 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isAuthenticated();
 
-    if (!this.isLoggedIn) {
+    if (this.isLoggedIn) {
+      this.fetchRecommendedMovies();
+    } else {
       this.fetchTrendingMovies();
     }
 
@@ -103,6 +109,24 @@ export class HomePageComponent implements OnInit {
   getTransformStyle(index: number) {
     const translateValue = -index * 100;
     return `translateX(${translateValue}%)`;
+  }
+
+  fetchRecommendedMovies(): void {
+    const url = 'https://seenematic-backend-production.up.railway.app/api/user/recommended'; // !!!!!!!!!!!NEED API!!!!!!!!!!!
+    this.http.get<any[]>(url).subscribe({
+      next: (response) => {
+        this.recommendedMovies = response.map((movie) => ({
+          title: movie.title,
+          rating: Math.round(movie.vote_average * 10), // Convert TMDB rating to percentage
+          image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          id: movie.id,
+        }));
+      },
+      error: (error) => {
+        console.error('Error fetching recommended movies:', error);
+        this.recommendedMovies = [];
+      },
+    });
   }
 
   fetchTrendingMovies(): void {

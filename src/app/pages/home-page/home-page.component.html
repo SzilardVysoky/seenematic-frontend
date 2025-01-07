@@ -1,4 +1,91 @@
 <div class="home-page-container">
+  <!-- Recommended Movies Section (For Logged-in Users) -->
+  <section *ngIf="isLoggedIn" class="mt-4">
+    <div class="text-center mb-4">
+      <h2
+        class="text-2xl font-bold text-gray-50 text-center inline-block w-full max-w-screen-lg bg-gradient-to-r from-blue-500 to-gray-500 rounded-lg shadow-md py-2 px-4 border-b-4 border-blue-900"
+        style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);"
+      >
+        Recommended Movies
+      </h2>
+    </div>
+    <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
+      <!-- Previous Button -->
+      <button 
+        class="absolute left-2 top-1/3 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full shadow-md transition-all duration-300 ease-in-out hover:bg-gray-300 hover:text-gray-800 focus:ring-4 focus:ring-gray-800 hover:scale-110 active:scale-90 active:bg-gray-400 focus:outline-none z-10"
+        (click)="moveCarousel('recommended', -1)">
+        &#10094;
+      </button>
+      <!-- Carousel Items -->
+      <div 
+        class="flex transition-transform duration-300 ease-in-out" 
+        [ngStyle]="{ 'transform': getTransformStyle(currentRecommendedIndex) }">
+        <div 
+          *ngFor="let movie of recommendedMovies" 
+          class="flex-shrink-0 p-4"
+          [ngClass]="carouselItemWidth">
+          <div class="bg-white rounded-lg shadow-lg h-full flex flex-col justify-between">
+            <img [src]="movie.image" alt="Movie Thumbnail" class="w-full aspect-[2/3] object-cover rounded mb-2" />
+            <div class="flex flex-col justify-center items-center h-full">
+              <h3 class="text-lg font-semibold text-center">{{ movie.title }}</h3>
+            </div>
+            <div class="mt-auto">
+              <!-- Rating Display -->
+              <div class="flex items-center justify-center">
+                <div class="relative w-12 h-12">
+                  <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 36 36">
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="15.9155"
+                      class="text-gray-200"
+                      stroke="currentColor"
+                      stroke-width="3.5"
+                      fill="none"
+                    ></circle>
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="15.9155"
+                      [attr.stroke-dasharray]="movie.rating + ', 100'"
+                      [class]="
+                        movie.rating > 85 ? 'text-green-300' :
+                        movie.rating > 80 ? 'text-green-500' :
+                        movie.rating > 75 ? 'text-yellow-300' :
+                        movie.rating > 70 ? 'text-yellow-500' :
+                        movie.rating > 60 ? 'text-orange-400' :
+                        movie.rating > 50 ? 'text-red-400' :
+                                            'text-red-600'"
+                      stroke="currentColor"
+                      stroke-width="3.5"
+                      stroke-linecap="round"
+                      fill="none"
+                    ></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-800">
+                    {{ movie.rating }}<span class="text-[10px]">%</span>
+                  </div>
+                </div>
+                <p class="ml-3 text-sm text-gray-700 font-semibold">Rating</p>
+              </div>
+              <button 
+                class="mt-2 bg-blue-600 text-white py-1 px-4 rounded hover:bg-gray-300 hover:text-blue-600 hover:scale-105 active:bg-blue-800 shadow-md transition-all duration-300 transform focus:outline-none focus:ring-4 focus:ring-blue-200 w-full"  
+                [routerLink]="['/movie', movie.id]">
+                More Info
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Next Button -->
+      <button 
+        class="absolute right-2 top-1/3 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full shadow-md transition-all duration-300 ease-in-out hover:bg-gray-300 hover:text-gray-800 focus:ring-4 focus:ring-gray-800 hover:scale-110 active:scale-90 active:bg-gray-400 focus:outline-none z-10"
+        (click)="moveCarousel('recommended', 1)">
+        &#10095;
+      </button>
+    </div>
+  </section>
+  
   <!-- Trending Movies Section (Only for Guests) -->
   <section *ngIf="!isLoggedIn" class="mt-4">
     <div class="text-center mb-4">
