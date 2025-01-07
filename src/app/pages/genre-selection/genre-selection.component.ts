@@ -11,7 +11,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./genre-selection.component.css']
 })
 export class GenreSelectionComponent {
-  genres: string[] = ['Action', 'Drama', 'Comedy', 'Horror', 'Romance', 'Thriller', 'Sci-Fi'];
+  genres: string[] = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 
+    'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 
+    'Horror', 'Music', 'Mystery', 'Romance', 'Science Fiction', 
+    'TV Movie', 'Thriller', 'War', 'Western'];
   selectedGenres: string[] = [];
   errorMessage: string | null = null;
 

@@ -1,15 +1,15 @@
 <div class="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+    <div class="bg-white rounded-lg p-6 max-w-lg w-full">
       <h2 class="text-xl font-bold mb-4 text-center">Select Your Favourite Genres</h2>
       
       <p class="text-sm text-gray-600 text-center mb-4">
         Please select at least two genres and up to three genres. Your choices will help us recommend movies you’ll love!
       </p>
       
-      <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-4 gap-4 mb-4">
         <button
           *ngFor="let genre of genres"
-          class="py-2 px-4 rounded border text-center"
+          class="w-full py-2 rounded border text-center"
           [ngClass]="selectedGenres.includes(genre) ? 'bg-blue-600 text-white' : 'bg-gray-100'"
           (click)="toggleGenre(genre)"
         >
