@@ -58,6 +58,6 @@ export class AuthService {
       if (!token) throw new Error('No token found');
     
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      return this.http.post('https://seenematic-backend-production.up.railway.app/api/userRoutes/select-genres', { genres }, { headers });
+      return this.http.post('https://seenematic-backend-production.up.railway.app/api/user/select-genres', { genres }, { headers });
     }
 }

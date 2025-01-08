@@ -45,7 +45,7 @@ export class AllMoviesComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.fetchMovies(); // Initial fetch
+    this.fetchMovies(); 
   }
 
   fetchMovies(): void {
@@ -56,20 +56,27 @@ export class AllMoviesComponent implements OnInit {
   
     this.http.get<any[]>(`${this.apiUrl}/discover`, { params }).subscribe({
       next: (response) => {
-        this.movies = response.map(movie => ({
-          id: movie.id, // Add the movie ID
+        this.movies = response
+        .filter(movie => 
+          movie.title && 
+          movie.poster_path && 
+          movie.vote_average !== null 
+        )
+        .map(movie => ({
+          id: movie.id,
           title: movie.title,
           rating: Math.round(movie.vote_average * 10), // Convert to percentage
           image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
         }));
-      },
-      error: (error) => console.error('Error fetching movies:', error),
-    });
-  }
+    },
+    error: (error) => console.error('Error fetching movies:', error),
+  });
+}
+
 
   searchMovies(): void {
     if (!this.searchQuery.trim()) {
-      this.fetchMovies(); // Reset if query is empty
+      this.fetchMovies(); // Reset if empty
       return;
     }
 
@@ -79,15 +86,22 @@ export class AllMoviesComponent implements OnInit {
 
     this.http.get<any[]>(`${this.apiUrl}/search`, { params }).subscribe({
       next: (response) => {
-        this.movies = response.map(movie => ({
+        this.movies = response
+        .filter(movie => 
+          movie.title && 
+          movie.poster_path && 
+          movie.vote_average !== null 
+        )
+        .map(movie => ({
+          id: movie.id,
           title: movie.title,
           rating: Math.round(movie.vote_average * 10),
           image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
         }));
-      },
-      error: (error) => console.error('Error searching movies:', error),
-    });
-  }
+    },
+    error: (error) => console.error('Error searching movies:', error),
+  });
+}
 
   onGenreChange(): void {
     this.page = 1; // Reset to page 1 on filter change
@@ -109,15 +123,22 @@ export class AllMoviesComponent implements OnInit {
     this.http.get<any[]>(`${this.apiUrl}/discover`, { params }).subscribe({
       next: (response) => {
         this.movies = [
-          ...this.movies,
-          ...response.map(movie => ({
+        ...this.movies,
+        ...response
+          .filter(movie => 
+            movie.title && 
+            movie.poster_path && 
+            movie.vote_average !== null 
+          )
+          .map(movie => ({
+            id: movie.id,
             title: movie.title,
             rating: Math.round(movie.vote_average * 10),
             image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
           })),
-        ];
-      },
-      error: (error) => console.error('Error loading more movies:', error),
-    });
-  }
+      ];
+    },
+    error: (error) => console.error('Error loading more movies:', error),
+  });
+}
 }
