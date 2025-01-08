@@ -109,6 +109,14 @@ export class MovieDetailsComponent implements OnInit {
     });
   }
 
+  openTrailerModal(): void {
+    if (this.trailerUrl) {
+      this.showTrailerModal = true; 
+    } else {
+      console.error('Trailer URL is not available.');
+    }
+  }
+
   // Redirect to login and return to the previous page where we tried to leave a comment
   redirectAfterTryingToCommentAsGuest(): void {
     const currentUrl = this.router.url; 

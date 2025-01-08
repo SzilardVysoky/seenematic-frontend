@@ -1,28 +1,23 @@
 <section class="movie-details max-w-screen-lg mx-auto my-6 p-4 bg-gray-100 rounded-lg">
   <!-- Movie Information Section -->
   <div *ngIf="movie; else loading" class="flex flex-col md:flex-row gap-6">
+    <!-- Movie Poster -->
     <img 
-    [src]="movie?.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/movie.jpg'" 
-    alt="Movie Poster" 
-    class="w-full md:w-1/3 h-auto rounded" 
+      [src]="movie?.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/movie.jpg'" 
+      alt="Movie Poster" 
+      class="w-full md:w-1/3 h-auto rounded" 
     />
-    <div class="flex flex-col justify-between">
+    
+    <!-- Movie Details -->
+    <div class="flex flex-col justify-between flex-grow min-w-0">
       <div>
         <h2 class="text-3xl font-bold">{{ movie.title }}</h2>
+
         <!-- Rating Display -->
         <div class="flex items-center my-2">
-          <!-- Circular Rating -->
           <div class="relative w-16 h-16">
             <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 36 36">
-              <circle
-                cx="18"
-                cy="18"
-                r="15.9155"
-                class="text-gray-200"
-                stroke="currentColor"
-                stroke-width="3.5"
-                fill="none"
-              ></circle>
+              <circle cx="18" cy="18" r="15.9155" class="text-gray-200" stroke="currentColor" stroke-width="3.5" fill="none"></circle>
               <circle
                 cx="18"
                 cy="18"
@@ -46,40 +41,48 @@
               {{ movie.vote_average * 10 | number:'1.0-0' }}<span class="text-[10px]">%</span>
             </div>
           </div>
-          <!-- Rating Text -->
           <p class="ml-3 text-lg text-gray-700 font-semibold">Rating</p>
         </div>
 
-        <!-- Movie Description Header -->
+        <!-- Movie Description -->
         <h3 class="text-xl font-bold mt-4 mb-2">Movie Description:</h3>
-        <p 
-          class="mb-4"
-          [ngClass]="{ 
-            'text-lg': movie.overview.length <= 450, 
-            'text-base': movie.overview.length > 450 
-          }"
-        >
+        <p class="mb-4" [ngClass]="{ 'text-lg': movie.overview.length <= 450, 'text-base': movie.overview.length > 450 }">
           {{ movie.overview }}
         </p>
-        <p class="text-gray-600">
-          Release Date: {{ movie.release_date || 'Unknown' }}
-        </p>
-        <p class="text-gray-600">
-          Runtime: {{ movie.runtime > 0 ? movie.runtime + ' mins' : 'Unknown' }}
-        </p>
+
+        <!-- Other Info -->
+        <p class="text-gray-600">Release Date: {{ movie.release_date || 'Unknown' }}</p>
+        <p class="text-gray-600">Runtime: {{ movie.runtime > 0 ? movie.runtime + ' mins' : 'Unknown' }}</p>
+
+        <!-- Genres -->
         <div class="flex flex-wrap gap-2 mt-4">
-          <span *ngFor="let genre of movie.genres" class="bg-blue-600 text-white py-1 px-3 rounded">{{ genre.name }}</span>
+          <ng-container *ngIf="movie.genres?.length > 0; else noGenres">
+            <span *ngFor="let genre of movie.genres" class="bg-blue-600 text-white py-1 px-3 rounded">{{ genre.name }}</span>
+          </ng-container>
+          <ng-template #noGenres>
+            <span class="bg-red-200 text-red-700 text-sm rounded text-center inline-block w-48 h-6">Genre Info Not Available</span>
+          </ng-template>
         </div>
       </div>
-      <button 
-      *ngIf="trailerUrl"
-      class="px-6 py-2 mx-2 text-sm text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 mt-6 self-end"
-      (click)="showTrailerModal = true">
-      Watch Trailer
-    </button>
-    <p *ngIf="!trailerUrl" class="text-sm text-red-500">No trailer available</p>
+
+      <!-- Trailer Button -->
+      <div class="flex justify-end mt-6">
+        <ng-container *ngIf="trailerUrl; else noTrailerMessage">
+          <button 
+            class="px-6 py-2 mx-2 text-sm text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+            (click)="openTrailerModal()">
+            Watch Trailer
+          </button>
+        </ng-container>
+        <ng-template #noTrailerMessage>
+          <p 
+            class="w-80 px-6 py-2 mx-2 text-sm text-red-500 font-medium uppercase tracking-wider bg-red-200 rounded-lg shadow-md transition-all duration-300 transform text-center">
+            No Trailer Available
+          </p>
+        </ng-template>
+      </div>
+    </div>
   </div>
-</div>
 
   <!-- Trailer Modal -->
 <div 
