@@ -113,10 +113,51 @@ class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-5
   <!-- User Reviews Section -->
   <div class="reviews mt-8">
     <h3 class="text-2xl font-semibold">User Reviews</h3>
-    <div *ngFor="let review of reviews" class="review bg-white rounded shadow-md p-4 my-4">
-      <p class="font-bold">{{ review.username }} - <span [innerHTML]="getStars(review.rating)"></span></p>
-      <p class="text-gray-600">{{ review.content }}</p>
-    </div>
+    <ng-container *ngIf="paginatedReviews.length > 0; else noReviews">
+      <div *ngFor="let review of paginatedReviews" [id]="'review-' + review.id" class="review bg-white rounded shadow-md p-4 my-4">
+        <p class="font-bold">
+          {{ review.author || review.username }}
+          <span class="text-gray-500 text-sm">- {{ review.created_at | date:'mediumDate' }}</span>
+        </p>
+    
+        <!-- Rating Section -->
+        <div *ngIf="review.author_details?.rating !== null" class="flex items-center mt-1 mb-2">
+          <span class="text-yellow-500 text-lg mr-2">★</span> <!-- Star Icon -->
+          <span class="text-gray-700 text-sm font-medium">{{ review.author_details.rating }}/10</span>
+        </div>
+    
+        <!-- Review Content -->
+        <p class="text-gray-600">
+          {{ 
+            expandedReviewIds.has(review.id) 
+            ? review.content 
+            : (review.content | slice:0:300) + (review.content.length > 300 ? '...' : '') 
+          }}
+        </p>
+    
+        <!-- View Details Button -->
+        <div *ngIf="review.content.length > 300" class="mt-2">
+          <button 
+            class="px-4 py-2 text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+            (click)="viewReviewDetails(review.id)"
+          >
+            {{ expandedReviewIds.has(review.id) ? 'Show Less' : 'View Details' }}
+          </button>
+        </div>
+      </div>
+      <!-- Load More Button -->
+      <button 
+        *ngIf="currentPage * pageSize < reviews.length"
+        class="px-6 py-2 text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 mt-4"
+        (click)="loadMoreReviews()"
+      >
+        Load More
+      </button>
+    </ng-container>
+  
+    <ng-template #noReviews>
+      <p class="text-gray-500 italic">No reviews available for this movie.</p>
+    </ng-template>
   </div>
 
   <!-- Add Review with Star Rating Section -->

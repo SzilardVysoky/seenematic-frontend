@@ -17,20 +17,22 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; // Ad
 })
 export class MovieDetailsComponent implements OnInit {
   movie: any = null; // Movie details from API
-
-  reviews = [
-    { username: 'User1', content: 'This movie was fantastic! I loved the storyline and the acting was incredible.', rating: 4 },
-    { username: 'User2', content: 'An okay movie, but I expected more from the plot.', rating: 3 }
-  ];
+  reviews: any[] = []; // Store fetched reviews
+  paginatedReviews: any[] = []; // Reviews visible on the current page
+  selectedReview: any = null; // Store detailed review data
+  expandedReviewIds: Set<string> = new Set(); // To track expanded reviews
 
   newReviewContent: string = '';
   newReviewRating: number = 5;
   hoverRating: number | null = null;
   loggedInUserName: string | null = null;
   errorMessage: string = '';
+
   movieId: string | null = null;
   trailerUrl: SafeResourceUrl | null = null; // Use SafeResourceUrl for sanitized URLs
   showTrailerModal: boolean = false; // Control trailer modal visibility
+  pageSize: number = 5; // Number of reviews per page
+  currentPage: number = 1; // For pagination
 
   private filter: Filter;
 
@@ -56,6 +58,8 @@ export class MovieDetailsComponent implements OnInit {
     if (this.movieId) {
       this.fetchMovieDetails(this.movieId);
       this.fetchMovieTrailer(this.movieId);
+      this.fetchReviews(this.movieId, this.currentPage); // Fetch reviews
+
     }
 
     // Fetch the logged-in user's name
@@ -107,6 +111,58 @@ export class MovieDetailsComponent implements OnInit {
         this.trailerUrl = null;
       }
     });
+  }
+
+  fetchReviews(movieId: string, page: number): void {
+    const url = `https://seenematic-backend-production.up.railway.app/api/review/t-reviews/list/${movieId}?page=${page}`;
+    this.http.get<any>(url).subscribe({
+      next: (response) => {
+        console.log(response);
+        if (response && Array.isArray(response.reviews)) {
+          // Append new reviews and update paginated view
+          this.reviews = [...this.reviews, ...response.reviews];
+          this.updatePaginatedReviews();
+        } else {
+          console.error('Unexpected response format:', response);
+        }
+      },
+      error: (error) => console.error('Error fetching reviews:', error),
+    });
+  }
+
+  updatePaginatedReviews(): void {
+    const startIndex = 0;
+    const endIndex = this.currentPage * this.pageSize;
+    this.paginatedReviews = this.reviews.slice(startIndex, endIndex);
+  }
+
+  
+
+  viewReviewDetails(reviewId: string): void {
+    if (this.expandedReviewIds.has(reviewId)) {
+      // Collapse the selected review
+      this.expandedReviewIds.delete(reviewId);
+    } else {
+      // Expand the selected review
+      this.expandedReviewIds.add(reviewId);
+  
+      // Scroll smoothly
+      setTimeout(() => {
+        const element = document.getElementById(`review-${reviewId}`);
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50); // Allow rendering to complete before scrolling
+    }
+  }
+  
+  closeReviewDetails(): void {
+    this.selectedReview = null;
+  }
+
+  loadMoreReviews(): void {
+    this.currentPage++;
+    if (this.movieId) {
+      this.fetchReviews(this.movieId, this.currentPage);
+    }
   }
 
   openTrailerModal(): void {
