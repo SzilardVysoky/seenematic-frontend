@@ -119,8 +119,14 @@ export class MovieDetailsComponent implements OnInit {
       next: (response) => {
         console.log(response);
         if (response && Array.isArray(response.reviews)) {
+
+          const updatedReviews = response.reviews.map((review: any) => ({
+            ...review,
+            authorTag: '(TMDB User)', // Add the tag dynamically for TMDB reviews
+          }));
+          
           // Append new reviews and update paginated view
-          this.reviews = [...this.reviews, ...response.reviews];
+          this.reviews = [...this.reviews, ...updatedReviews];
           this.updatePaginatedReviews();
         } else {
           console.error('Unexpected response format:', response);
@@ -181,33 +187,45 @@ export class MovieDetailsComponent implements OnInit {
 
   submitReview() {
     if (!this.newReviewContent.trim()) {
-      this.errorMessage = 'Review content cannot be empty.';
+      this.showTemporaryError('Review content cannot be empty.');
       return;
     }
-
+  
     const normalizedContent = this.newReviewContent.toLowerCase();
-    const bannedWords = this.filter.list; 
+    const bannedWords = this.filter.list;
     for (const word of bannedWords) {
       if (normalizedContent.includes(word)) {
-        this.errorMessage = 'Your review contains inappropriate language.';
+        this.showTemporaryError('Your review contains inappropriate language.');
         return;
       }
     }
-
+  
     const newReview = {
-      username: this.loggedInUserName || 'Guest', // Default 'Guest' if not logged in
+      id: Date.now().toString(), 
+      author: this.loggedInUserName,
+      authorTag: '(Seenematic User)',
+      author_details: {
+        rating: this.newReviewRating,
+      },
       content: this.newReviewContent,
-      rating: this.newReviewRating
+      created_at: new Date().toISOString(), // Set the current timestamp
     };
-
-    this.reviews.push(newReview);
+  
+    // Review locally
+    this.reviews.unshift(newReview); // Add to the top of the list
+    this.updatePaginatedReviews(); 
+  
+    // Clear the form
     this.newReviewContent = '';
     this.newReviewRating = 5;
-    this.errorMessage = ''; 
+    this.errorMessage = '';
   }
 
-  // Helper function to convert numeric rating to star symbols
-  getStars(rating: number): string {
-    return '⭐'.repeat(rating);
-  }
+  // Error msg 5sec
+  showTemporaryError(message: string): void {
+  this.errorMessage = message;
+  setTimeout(() => {
+    this.errorMessage = ''; 
+  }, 5000);
+}
 }
