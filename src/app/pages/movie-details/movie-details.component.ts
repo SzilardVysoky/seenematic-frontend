@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf, NgFor, NgClass, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { Filter } from 'bad-words';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; // Added DomSanitizer
@@ -114,27 +114,43 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   fetchReviews(movieId: string, page: number): void {
-    const url = `https://seenematic-backend-production.up.railway.app/api/review/t-reviews/list/${movieId}?page=${page}`;
-    this.http.get<any>(url).subscribe({
+    // Fetch TMDB reviews
+    const tmdbUrl = `https://seenematic-backend-production.up.railway.app/api/review/t-reviews/list/${movieId}?page=${page}`;
+    this.http.get<any>(tmdbUrl).subscribe({
       next: (response) => {
-        console.log(response);
         if (response && Array.isArray(response.reviews)) {
-
-          const updatedReviews = response.reviews.map((review: any) => ({
+          const tmdbReviews = response.reviews.map((review: any) => ({
             ...review,
-            authorTag: '(TMDB User)', // Add the tag dynamically for TMDB reviews
+            authorTag: '(TMDB User)', // Add TMDB tag
           }));
-          
-          // Append new reviews and update paginated view
-          this.reviews = [...this.reviews, ...updatedReviews];
+          this.reviews = [...this.reviews, ...tmdbReviews];
           this.updatePaginatedReviews();
         } else {
-          console.error('Unexpected response format:', response);
+          console.error('Unexpected TMDB review format:', response);
         }
       },
-      error: (error) => console.error('Error fetching reviews:', error),
+      error: (error) => console.error('Error fetching TMDB reviews:', error),
+    });
+
+    // Fetch Seenematic reviews
+    const userUrl = `https://seenematic-backend-production.up.railway.app/api/review/list/${movieId}?page=${page}`;
+    this.http.get<any>(userUrl).subscribe({
+      next: (response) => {
+        if (response && response.success && Array.isArray(response.data.reviews)) {
+          const userReviews = response.data.reviews.map((review: any) => ({
+            ...review,
+            authorTag: '(Seenematic User)', // Add Seenematic tag
+          }));
+          this.reviews = [...this.reviews, ...userReviews];
+          this.updatePaginatedReviews();
+        } else {
+          console.error('Unexpected user review format:', response);
+        }
+      },
+      error: (error) => console.error('Error fetching user reviews:', error),
     });
   }
+
 
   updatePaginatedReviews(): void {
     const startIndex = 0;
@@ -185,47 +201,57 @@ export class MovieDetailsComponent implements OnInit {
     this.router.navigate(['/login'], { queryParams: { returnUrl: currentUrl } });
   }
 
-  submitReview() {
+  submitReview(): void {
+    if (!this.movieId || !this.movie) {
+      this.showTemporaryError('Movie details are missing. Unable to submit review.');
+      return;
+    }
+
     if (!this.newReviewContent.trim()) {
       this.showTemporaryError('Review content cannot be empty.');
       return;
     }
-  
+
     const normalizedContent = this.newReviewContent.toLowerCase();
-    const bannedWords = this.filter.list;
-    for (const word of bannedWords) {
+    for (const word of this.filter.list) {
       if (normalizedContent.includes(word)) {
         this.showTemporaryError('Your review contains inappropriate language.');
         return;
       }
     }
-  
-    const newReview = {
-      id: Date.now().toString(), 
-      author: this.loggedInUserName,
-      authorTag: '(Seenematic User)',
-      author_details: {
-        rating: this.newReviewRating,
-      },
+
+    const url = `https://seenematic-backend-production.up.railway.app/api/review/add/${this.movieId}`;
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.authService.getToken()}`,
+    });
+
+    const reviewPayload = {
+      movie_name: this.movie.title,
       content: this.newReviewContent,
-      created_at: new Date().toISOString(), // Set the current timestamp
+      rating: this.newReviewRating,
     };
-  
-    // Review locally
-    this.reviews.unshift(newReview); // Add to the top of the list
-    this.updatePaginatedReviews(); 
-  
-    // Clear the form
-    this.newReviewContent = '';
-    this.newReviewRating = 5;
-    this.errorMessage = '';
+
+    this.http.post<any>(url, reviewPayload, { headers }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.fetchReviews(this.movieId!, 1); // Re-fetch reviews
+          this.newReviewContent = '';
+          this.newReviewRating = 5;
+        } else {
+          this.showTemporaryError('Failed to submit review. Please try again.');
+        }
+      },
+      error: (error) => {
+        console.error('Error submitting review:', error);
+        this.showTemporaryError('Failed to submit review. Please try again.');
+      },
+    });
   }
 
-  // Error msg 5sec
   showTemporaryError(message: string): void {
-  this.errorMessage = message;
-  setTimeout(() => {
-    this.errorMessage = ''; 
-  }, 5000);
-}
+    this.errorMessage = message;
+    setTimeout(() => {
+      this.errorMessage = '';
+    }, 5000);
+  }
 }
