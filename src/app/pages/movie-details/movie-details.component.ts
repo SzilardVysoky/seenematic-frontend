@@ -241,9 +241,13 @@ export class MovieDetailsComponent implements OnInit {
           this.showTemporaryError('Failed to submit review. Please try again.');
         }
       },
-      error: (error) => {
-        console.error('Error submitting review:', error);
-        this.showTemporaryError('Failed to submit review. Please try again.');
+      error: (error) => {  
+        // Display the backend error msg
+        const backendErrorMessage =
+          error.error && error.error.error
+            ? error.error.error
+            : 'Failed to submit review. Please try again.';
+        this.showTemporaryError(backendErrorMessage);
       },
     });
   }
