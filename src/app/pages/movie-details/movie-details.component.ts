@@ -58,7 +58,7 @@ export class MovieDetailsComponent implements OnInit {
     if (this.movieId) {
       this.fetchMovieDetails(this.movieId);
       this.fetchMovieTrailer(this.movieId);
-      this.fetchReviews(this.movieId, this.currentPage); // Fetch reviews
+      this.fetchReviews(this.movieId, this.currentPage); 
 
     }
 
