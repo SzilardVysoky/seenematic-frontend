@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { Filter } from 'bad-words';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; // Added DomSanitizer
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; 
 
 @Component({
   selector: 'app-movie-details',
@@ -55,11 +55,16 @@ export class MovieDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.movieId = this.route.snapshot.paramMap.get('id');
+    const highlightReview = this.route.snapshot.queryParamMap.get('highlightReview');
+
     if (this.movieId) {
       this.fetchMovieDetails(this.movieId);
       this.fetchMovieTrailer(this.movieId);
-      this.fetchReviews(this.movieId, this.currentPage); 
-
+      this.fetchReviews(this.movieId, this.currentPage, () => {
+        if (highlightReview) {
+          this.scrollToReview(highlightReview);
+        }
+      });
     }
 
     // Fetch the logged-in user's name
@@ -113,9 +118,13 @@ export class MovieDetailsComponent implements OnInit {
     });
   }
 
-  fetchReviews(movieId: string, page: number): void {
-    // Fetch TMDB reviews
+  fetchReviews(movieId: string, page: number, callback?: () => void): void {
     const tmdbUrl = `https://seenematic-backend-production.up.railway.app/api/review/t-reviews/list/${movieId}?page=${page}`;
+    const userUrl = `https://seenematic-backend-production.up.railway.app/api/review/list/${movieId}?page=${page}`;
+
+    let reviewsLoaded = false;
+
+    // Fetch TMDB reviews
     this.http.get<any>(tmdbUrl).subscribe({
       next: (response) => {
         if (response && Array.isArray(response.reviews)) {
@@ -125,15 +134,14 @@ export class MovieDetailsComponent implements OnInit {
           }));
           this.reviews = [...this.reviews, ...tmdbReviews];
           this.updatePaginatedReviews();
-        } else {
-          console.error('Unexpected TMDB review format:', response);
+          reviewsLoaded = true;
+          if (callback) callback();
         }
       },
       error: (error) => console.error('Error fetching TMDB reviews:', error),
     });
 
     // Fetch Seenematic reviews
-    const userUrl = `https://seenematic-backend-production.up.railway.app/api/review/list/${movieId}?page=${page}`;
     this.http.get<any>(userUrl).subscribe({
       next: (response) => {
         if (response && response.success && Array.isArray(response.data.reviews)) {
@@ -143,14 +151,33 @@ export class MovieDetailsComponent implements OnInit {
           }));
           this.reviews = [...this.reviews, ...userReviews];
           this.updatePaginatedReviews();
-        } else {
-          console.error('Unexpected user review format:', response);
+          reviewsLoaded = true;
+          if (callback) callback();
         }
       },
-      error: (error) => console.error('Error fetching user reviews:', error),
+      error: (error) => console.error('Error fetching Seenematic reviews:', error),
     });
+
+    if (!reviewsLoaded && page < 10) {
+      this.fetchReviews(movieId, page + 1, callback); // Fetch next page
+    }
   }
 
+  scrollToReview(reviewId: string): void {
+    const interval = setInterval(() => {
+      const reviewElement = document.getElementById(`review-${reviewId}`);
+      if (reviewElement) {
+        reviewElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        reviewElement.classList.add('highlight');
+        setTimeout(() => reviewElement.classList.remove('highlight'), 3000);
+        clearInterval(interval); // Stop checking once found
+      } else if (this.currentPage * this.pageSize < this.reviews.length) {
+        this.loadMoreReviews(); // Trigger loading more reviews if not found
+      } else {
+        clearInterval(interval); // Stop if end of reviews
+      }
+    }, 100); // Check every 100ms
+  }
 
   updatePaginatedReviews(): void {
     const startIndex = 0;

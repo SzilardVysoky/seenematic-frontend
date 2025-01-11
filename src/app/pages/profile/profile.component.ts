@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { NgFor, NgIf, DatePipe, SlicePipe } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [NgFor, NgIf, DatePipe, SlicePipe], 
+  imports: [NgFor, NgIf, DatePipe, SlicePipe, RouterModule], 
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -14,7 +15,6 @@ export class ProfileComponent implements OnInit {
   user: { username: string; email: string; avatar?: string } | null = null;
   errorMessage: string | null = null;
   reviews: any[] = []; // Store user reviews
-  expandedReviewIds: Set<string> = new Set(); // Track expanded reviews
   currentPage: number = 1; // Start at page 1
   totalPages: number = 0; // Total number of pages
 
@@ -62,6 +62,7 @@ export class ProfileComponent implements OnInit {
             createdAt: review.created_at,
             rating: review.author_details?.rating ?? null, 
             authorTag: review.authorTag ?? null, // NOT NEEDED IN PROFILE
+            movieId: review.movie_id,
           }));
           this.reviews = [...this.reviews, ...newReviews];
           this.totalPages = response.data.totalPages;
@@ -79,14 +80,6 @@ export class ProfileComponent implements OnInit {
   loadMoreReviews(): void {
     if (this.currentPage < this.totalPages) {
       this.fetchUserReviews(this.currentPage + 1);
-    }
-  }
-
-  toggleReviewExpansion(reviewId: string): void {
-    if (this.expandedReviewIds.has(reviewId)) {
-      this.expandedReviewIds.delete(reviewId);
-    } else {
-      this.expandedReviewIds.add(reviewId);
     }
   }
 }

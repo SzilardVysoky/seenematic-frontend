@@ -16,3 +16,17 @@
   .text-gray-300 {
     color: #d1d5db; /* Light gray for unselected stars */
   }
+
+  .highlight {
+    animation: highlight 1s ease-in-out;
+    background-color: #fef3c7;
+  }
+  
+  @keyframes highlight {
+    0% {
+      background-color: #fef3c7;
+    }
+    100% {
+      background-color: transparent;
+    }
+  }

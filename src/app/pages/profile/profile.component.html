@@ -27,16 +27,22 @@
   </div>
 
   <!-- User Reviews Section -->
-<div class="user-reviews">
-  <h3 class="text-2xl font-semibold mb-4">Your Reviews</h3>
-  <div *ngFor="let review of reviews" [id]="'review-' + review.id" class="review bg-white rounded shadow-md p-4 mb-4">
-    <p class="font-bold">
-      {{ review.movieTitle }}
-      <span *ngIf="review.authorTag" class="text-blue-500 text-sm font-semibold italic">
-        <!-- {{ review.authorTag }} NOT NEEDED IN PROFILE -->
-      </span>
-      <span class="text-gray-500 text-sm">- {{ review.createdAt | date: 'mediumDate' }}</span>
-    </p>
+  <div class="user-reviews">
+    <h3 class="text-2xl font-semibold mb-4">Your Reviews</h3>
+    <div
+      *ngFor="let review of reviews"
+      [id]="'review-' + review.id"
+      class="review bg-white rounded shadow-md p-4 mb-4 cursor-pointer hover:bg-blue-100"
+      [routerLink]="['/movie', review.movieId]"
+      [queryParams]="{ highlightReview: review.id }"
+    >
+      <p class="font-bold">
+        {{ review.movieTitle }}
+        <span *ngIf="review.authorTag" class="text-blue-500 text-sm font-semibold italic">
+          <!-- {{ review.authorTag }} NOT NEEDED IN PROFILE -->
+        </span>
+        <span class="text-gray-500 text-sm">- {{ review.createdAt | date: 'mediumDate' }}</span>
+      </p>
 
     <!-- Rating Section -->
     <div *ngIf="review.rating !== null" class="flex items-center mt-1 mb-2">
@@ -47,30 +53,20 @@
     <!-- Review Content -->
     <p class="text-gray-600 break-words whitespace-pre-wrap">
       {{
-        expandedReviewIds.has(review.id)
-          ? review.content
-          : (review.content | slice: 0:300) + (review.content.length > 300 ? '...' : '')
+        review.content.length > 150
+          ? (review.content | slice: 0:150) + '...'
+          : review.content
       }}
     </p>
-
-    <!-- View Details Button -->
-    <div *ngIf="review.content.length > 300" class="mt-2">
-      <button
-        class="px-1 py-1 text-white text-xs font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
-        (click)="toggleReviewExpansion(review.id)"
-      >
-        {{ expandedReviewIds.has(review.id) ? 'Show Less' : 'View Details' }}
-      </button>
-    </div>
   </div>
 
-  <!-- Load More Button -->
-  <button
-    *ngIf="currentPage < totalPages"
-    class="px-6 py-2 text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 mt-4"
-    (click)="loadMoreReviews()"
-  >
-    Load More
-  </button>
-</div>
+    <!-- Load More Button -->
+    <button
+      *ngIf="currentPage < totalPages"
+      class="px-6 py-2 text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 mt-4"
+      (click)="loadMoreReviews()"
+    >
+      Load More
+    </button>
+  </div>
 </section>
