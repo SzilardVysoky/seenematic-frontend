@@ -18,10 +18,10 @@ export class ProfileComponent implements OnInit {
   currentPage: number = 1; // Start at page 1
   totalPages: number = 0; // Total number of pages
 
-  favoriteMovies = [
-    { title: 'Favorite Movie 1', image: 'assets/movie-placeholder.jpg' },
-    { title: 'Favorite Movie 2', image: 'assets/movie-placeholder.jpg' },
-  ];
+  favoriteMovies: { id: string; title: string; posterPath: string | null }[] = [];
+  isLoadingFavorites: boolean = true;
+  isLoadingReviews: boolean = true;
+
 
 
   constructor(private authService: AuthService, private http: HttpClient) {}
@@ -35,9 +35,59 @@ export class ProfileComponent implements OnInit {
           avatar: 'assets/user-placeholder.jpg' 
         };
         this.fetchUserReviews(this.currentPage);
+        this.fetchFavoriteMovies();
       },
       error: (error) => {
         this.errorMessage = error.error.message || 'Unable to fetch profile details';
+      },
+    });
+  }
+
+  fetchFavoriteMovies(): void {
+    const url = 'https://seenematic-backend-production.up.railway.app/api/user/favorites';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
+  
+    this.http.get<{ favorites: string[] }>(url, { headers }).subscribe({
+      next: (response) => {
+        const movieIds = response.favorites;
+  
+        // Fetch movie details for each favorite movie
+        const movieDetailsRequests = movieIds.map((movieId) =>
+          this.http.get<any>(`https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}`).toPromise()
+        );
+  
+        Promise.all(movieDetailsRequests)
+          .then((movies) => {
+            this.favoriteMovies = movies.map((movie) => ({
+              id: movie.id,
+              title: movie.title,
+              posterPath: movie.poster_path,
+            }));
+          })
+          .catch((error) => console.error('Error fetching movie details:', error))
+          .finally(() => {
+            this.isLoadingFavorites = false;
+          });
+      },
+      error: () => {
+        console.error('Failed to fetch favorite movies');
+        this.isLoadingFavorites = false;
+      },
+    });
+  }
+
+  removeFromFavourites(event: Event, movieId: string): void {
+    event.stopPropagation(); // Prevent the event from bubbling up to the parent
+    const url = `https://seenematic-backend-production.up.railway.app/api/user/favorites/${movieId}`;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
+  
+    this.http.delete(url, { headers }).subscribe({
+      next: () => {
+        // Remove the movie from the favoriteMovies list
+        this.favoriteMovies = this.favoriteMovies.filter(movie => movie.id !== movieId);
+      },
+      error: () => {
+        console.error('Failed to remove movie from favorites');
       },
     });
   }
@@ -47,6 +97,7 @@ export class ProfileComponent implements OnInit {
     const token = this.authService.getToken();
     if (!token) {
       this.errorMessage = 'User is not authenticated.';
+      this.isLoadingReviews = false; // Stop loading
       return;
     }
   
@@ -73,6 +124,9 @@ export class ProfileComponent implements OnInit {
       },
       error: (error) => {
         this.errorMessage = error.error.message || 'Error fetching user reviews.';
+      },
+      complete: () => {
+        this.isLoadingReviews = false;
       },
     });
   }

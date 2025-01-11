@@ -1,12 +1,52 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-favourites',
   standalone: true,
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './favourites.component.html',
   styleUrl: './favourites.component.css'
 })
-export class FavouritesComponent {
+export class FavouritesComponent implements OnInit {
+  favoriteMovies: { id: string; title: string; posterPath: string | null }[] = [];
 
+  constructor(private http: HttpClient, private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.fetchFavouriteMovies();
+  }
+
+  fetchFavouriteMovies(): void {
+    const url = 'https://seenematic-backend-production.up.railway.app/api/user/favorites';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
+
+    this.http.get<{ favorites: string[] }>(url, { headers }).subscribe({
+      next: (response) => {
+        const movieIds = response.favorites;
+
+        // Fetch movie details for each favorite movie
+        const movieDetailsRequests = movieIds.map((movieId) =>
+          this.http.get<any>(`https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}`).toPromise()
+        );
+
+        Promise.all(movieDetailsRequests)
+          .then((movies) => {
+            this.favoriteMovies = movies.map((movie) => ({
+              id: movie.id,
+              title: movie.title,
+              posterPath: movie.poster_path,
+            }));
+          })
+          .catch((error) => {
+            console.error('Error fetching movie details:', error);
+          });
+      },
+      error: () => {
+        console.error('Failed to fetch favorite movies');
+      },
+    });
+  }
 }

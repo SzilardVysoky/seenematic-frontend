@@ -1,12 +1,20 @@
-<section class="profile-page max-w-screen-lg mx-auto my-8 p-6 bg-gray-100 rounded-lg">
+<section class="profile-page max-w-screen-lg mx-auto my-8 p-6 bg-white rounded-lg shadow-xl border border-gray-200">
+  <!-- User Profile Heading -->
+  <div class="text-center mb-6">
+    <h1 class="text-4xl font-semibold text-blue-600">User Profile</h1>
+    <p class="text-base text-gray-600 mt-1">Welcome! Explore your account details and recent activity.</p>
+    <div class="mt-2 w-120 mx-auto h-1 bg-blue-600 rounded"></div>
+  </div>
+
   <ng-container *ngIf="user; else errorTemplate">
-    <!-- User Information -->
-    <div class="profile-info flex items-center gap-4 mb-8">
-      <img [src]="user.avatar" alt="User Avatar" class="w-24 h-24 rounded-full border border-gray-300" />
-      <div>
-        <h2 class="text-3xl font-bold">{{ user.username || 'Name not available' }}</h2>
-        <p class="text-gray-600">Email: {{ user.email || 'E-mail not available' }}</p>
-      </div>
+    <!-- Centered User Information -->
+    <div class="profile-info flex flex-col items-center justify-center bg-gray-50 rounded-md shadow-sm mb-6">
+      <h2 class="text-2xl font-bold text-gray-700 text-center">
+        {{ user.username || 'Name not available' }}
+      </h2>
+      <p class="text-sm text-gray-600 mt-2 text-center">
+        <span class="font-medium">Email:</span> {{ user.email || 'E-mail not available' }}
+      </p>
     </div>
   </ng-container>
 
@@ -15,58 +23,108 @@
     <p class="text-red-500">{{ errorMessage }}</p>
   </ng-template>
 
-  <!-- Favorite Movies Section -->
-  <div class="favorites mb-8">
-    <h3 class="text-2xl font-semibold mb-4">Favorite Movies</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-      <div *ngFor="let movie of favoriteMovies" class="movie-card bg-white rounded shadow-md p-4">
-        <img [src]="'movie.jpg'" alt="Movie Thumbnail" class="w-full h-64 object-cover rounded" />
-        <h4 class="text-lg font-semibold mt-2">{{ movie.title }}</h4>
+  <!-- Favourite Movies Section -->
+  <div class="favourites mb-8 bg-gray-300">
+    <h3 class="text-2xl text-blue-600 font-semibold mb-4 shadow-lg">Favourite Movies:</h3>
+    <ng-container *ngIf="isLoadingFavorites; else favouritesContent">
+      <!-- Loading Indicator -->
+      <div class="flex items-center justify-center h-16">
+        <div class="loader border-t-4 border-blue-600 rounded-full w-10 h-10 animate-spin"></div>
       </div>
-    </div>
+    </ng-container>
+
+    <ng-template #favouritesContent>
+      <ng-container *ngIf="favoriteMovies.length > 0; else noFavouritesTemplate">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-8 gap-2 p-2">
+          <div
+            *ngFor="let movie of favoriteMovies"
+            class="movie-card bg-white rounded shadow-md p-2 cursor-pointer flex flex-col items-center justify-between h-full"
+            [routerLink]="['/movie', movie.id]"
+          >
+            <img
+              [src]="movie.posterPath ? 'https://image.tmdb.org/t/p/w500' + movie.posterPath : 'assets/movie-placeholder.jpg'"
+              alt="{{ movie.title }}"
+              class="w-24 h-auto object-contain rounded"
+            />
+            <h4 class="text-center text-xs font-medium flex-grow flex items-center">
+              {{ movie.title.length > 18 ? (movie.title | slice:0:18) + '...' : movie.title }}
+            </h4>
+            <!-- Remove from Favourites Button -->
+            <button
+              class="mt-1 text-xs text-red-500 hover:underline flex items-center gap-1"
+              (click)="removeFromFavourites($event, movie.id)"
+            >
+              <span class="material-icons text-sm">close</span> Remove
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </ng-template>
+
+    <!-- No Favourite Movies -->
+    <ng-template #noFavouritesTemplate>
+      <div class="flex items-center justify-center p-2">
+        <p class="text-gray-900 italic">You have no favourite movies yet.</p>
+      </div>
+    </ng-template>
   </div>
 
   <!-- User Reviews Section -->
-  <div class="user-reviews">
-    <h3 class="text-2xl font-semibold mb-4">Your Reviews</h3>
-    <div
-      *ngFor="let review of reviews"
-      [id]="'review-' + review.id"
-      class="review bg-white rounded shadow-md p-4 mb-4 cursor-pointer hover:bg-blue-100"
-      [routerLink]="['/movie', review.movieId]"
-      [queryParams]="{ highlightReview: review.id }"
-    >
-      <p class="font-bold">
-        {{ review.movieTitle }}
-        <span *ngIf="review.authorTag" class="text-blue-500 text-sm font-semibold italic">
-          <!-- {{ review.authorTag }} NOT NEEDED IN PROFILE -->
-        </span>
-        <span class="text-gray-500 text-sm">- {{ review.createdAt | date: 'mediumDate' }}</span>
-      </p>
+  <div class="user-reviews bg-gray-300 p-2">
+    <h3 class="text-2xl text-blue-600 font-semibold mb-4 shadow-lg">Your Reviews:</h3>
+    <ng-container *ngIf="isLoadingReviews; else reviewsContent">
+      <!-- Loading Indicator -->
+      <div class="flex items-center justify-center h-16">
+        <div class="loader border-t-4 border-blue-600 rounded-full w-10 h-10 animate-spin"></div>
+      </div>
+    </ng-container>
 
-    <!-- Rating Section -->
-    <div *ngIf="review.rating !== null" class="flex items-center mt-1 mb-2">
-      <span class="text-yellow-500 text-lg mr-2">★</span> <!-- Star Icon -->
-      <span class="text-gray-700 text-sm font-medium">{{ review.rating }}/10</span>
-    </div>
+    <ng-template #reviewsContent>
+      <ng-container *ngIf="reviews.length > 0; else noReviewsTemplate">
+        <div
+          *ngFor="let review of reviews"
+          [id]="'review-' + review.id"
+          class="review bg-white rounded shadow-md p-4 mb-4 cursor-pointer hover:bg-blue-100"
+          [routerLink]="['/movie', review.movieId]"
+          [queryParams]="{ highlightReview: review.id }"
+        >
+          <p class="font-bold">
+            {{ review.movieTitle }}
+            <span *ngIf="review.authorTag" class="text-blue-500 text-sm font-semibold italic"></span>
+            <span class="text-gray-500 text-sm">- {{ review.createdAt | date: 'mediumDate' }}</span>
+          </p>
 
-    <!-- Review Content -->
-    <p class="text-gray-600 break-words whitespace-pre-wrap">
-      {{
-        review.content.length > 150
-          ? (review.content | slice: 0:150) + '...'
-          : review.content
-      }}
-    </p>
-  </div>
+          <!-- Rating Section -->
+          <div *ngIf="review.rating !== null" class="flex items-center mt-1 mb-2">
+            <span class="text-yellow-500 text-lg mr-2">★</span> <!-- Star Icon -->
+            <span class="text-gray-700 text-sm font-medium">{{ review.rating }}/10</span>
+          </div>
 
-    <!-- Load More Button -->
-    <button
-      *ngIf="currentPage < totalPages"
-      class="px-6 py-2 text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 mt-4"
-      (click)="loadMoreReviews()"
-    >
-      Load More
-    </button>
+          <!-- Review Content -->
+          <p class="text-gray-600 break-words whitespace-pre-wrap">
+            {{
+              review.content.length > 150
+                ? (review.content | slice: 0:150) + '...'
+                : review.content
+            }}
+          </p>
+        </div>
+        <!-- Load More Button -->
+        <button
+          *ngIf="currentPage < totalPages"
+          class="px-6 py-2 text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 mt-4"
+          (click)="loadMoreReviews()"
+        >
+          Load More
+        </button>
+      </ng-container>
+    </ng-template>
+
+    <!-- No Reviews -->
+    <ng-template #noReviewsTemplate>
+      <div class="flex items-center justify-center p-2">
+        <p class="text-gray-900 italic text-center">You have not written any reviews yet.</p>
+      </div>
+    </ng-template>
   </div>
 </section>

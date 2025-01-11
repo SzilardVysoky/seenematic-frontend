@@ -34,6 +34,8 @@ export class MovieDetailsComponent implements OnInit {
   pageSize: number = 5; // Number of reviews per page
   currentPage: number = 1; // For pagination
 
+  isFavorite: boolean = false;
+
   private filter: Filter;
 
   constructor(private route: ActivatedRoute,
@@ -60,6 +62,7 @@ export class MovieDetailsComponent implements OnInit {
     if (this.movieId) {
       this.fetchMovieDetails(this.movieId);
       this.fetchMovieTrailer(this.movieId);
+      this.checkIfFavourite();
       this.fetchReviews(this.movieId, this.currentPage, () => {
         if (highlightReview) {
           this.scrollToReview(highlightReview);
@@ -117,6 +120,39 @@ export class MovieDetailsComponent implements OnInit {
       }
     });
   }
+
+  checkIfFavourite(): void {
+    const url = 'https://seenematic-backend-production.up.railway.app/api/user/favorites';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
+
+    this.http.get<{ favorites: string[] }>(url, { headers }).subscribe({
+      next: (response) => {
+        this.isFavorite = response.favorites.includes(this.movieId!);
+      },
+      error: () => {
+        console.error('Failed to check favorite status');
+      },
+    });
+  }
+
+  toggleFavourite(): void {
+    const url = `https://seenematic-backend-production.up.railway.app/api/user/favorites/${this.movieId}`;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
+
+    const request = this.isFavorite
+      ? this.http.delete(url, { headers }) // Remove from favorites
+      : this.http.post(url, {}, { headers }); // Add to favorites
+
+    request.subscribe({
+      next: () => {
+        this.isFavorite = !this.isFavorite;
+      },
+      error: () => {
+        console.error('Failed to toggle favorite status');
+      },
+    });
+  }
+
 
   fetchReviews(movieId: string, page: number, callback?: () => void): void {
     const tmdbUrl = `https://seenematic-backend-production.up.railway.app/api/review/t-reviews/list/${movieId}?page=${page}`;

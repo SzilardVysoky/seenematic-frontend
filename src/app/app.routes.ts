@@ -22,6 +22,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'genre-selection', component: GenreSelectionComponent, canActivate: [GenreSelectionGuard] },
+  { path: 'favorites', component: FavouritesComponent },
   { path: '**', redirectTo: '' } // Redirect to home if the route doesn't exist
 ];
 

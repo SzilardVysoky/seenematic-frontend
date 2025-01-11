@@ -65,8 +65,28 @@
         </div>
       </div>
 
-      <!-- Trailer Button -->
       <div class="flex justify-end mt-6">
+        <!-- Favourite Button -->
+      <ng-container *ngIf="authService.isAuthenticated();">
+        <button
+          class="flex items-center px-6 py-2 mx-2 text-sm font-medium uppercase tracking-wider rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-200"
+          [ngClass]="{
+            'bg-gray-200 text-gray-600 hover:bg-gray-300': !isFavorite,
+            'bg-red-600 text-white hover:bg-red-700': isFavorite
+          }"
+          (click)="toggleFavourite()"
+        >
+          <span
+            class="material-icons mr-2"
+            [ngClass]="{ 'text-red-500': !isFavorite, 'text-white': isFavorite }"
+          >
+            favorite
+          </span>
+          {{ isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}
+        </button>
+      </ng-container>
+      
+        <!-- Trailer Button -->
         <ng-container *ngIf="trailerUrl; else noTrailerMessage">
           <button 
             class="px-6 py-2 mx-2 text-sm text-white font-medium uppercase tracking-wider bg-blue-600 hover:bg-gray-300 hover:text-blue-600 active:bg-blue-800 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
@@ -74,6 +94,7 @@
             Watch Trailer
           </button>
         </ng-container>
+        
         <ng-template #noTrailerMessage>
           <p 
             class="w-80 px-6 py-2 mx-2 text-sm text-red-500 font-medium uppercase tracking-wider bg-red-200 rounded-lg shadow-md transition-all duration-300 transform text-center">
@@ -111,8 +132,9 @@ class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-5
   </ng-template>
 
   <!-- User Reviews Section -->
-  <div class="reviews mt-8">
-    <h3 class="text-2xl font-semibold">User Reviews</h3>
+  <div class="reviews mt-8 bg-gray-300">
+    <h3 class="text-2xl text-blue-600 font-semibold shadow-lg">User Reviews:</h3>
+    <div class="p-2">
     <ng-container *ngIf="paginatedReviews.length > 0; else noReviews">
       <div *ngFor="let review of paginatedReviews" [id]="'review-' + review.id" class="review bg-white rounded shadow-md p-4 my-4">
         <p class="font-bold">
@@ -167,9 +189,10 @@ class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-5
     </ng-container>
   
     <ng-template #noReviews>
-      <p class="text-gray-500 italic">No reviews available for this movie.</p>
+      <p class="text-gray-900 italic">No reviews available for this movie.</p>
     </ng-template>
   </div>
+</div>
 
   <!-- Add Review with Star Rating Section -->
   <div class="add-review mt-8 p-4 bg-gray-200 rounded-lg">
