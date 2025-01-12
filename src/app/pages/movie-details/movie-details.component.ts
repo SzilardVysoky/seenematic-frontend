@@ -27,6 +27,7 @@ export class MovieDetailsComponent implements OnInit {
   hoverRating: number | null = null;
   loggedInUserName: string | null = null;
   errorMessage: string = '';
+  successMessage: string = '';
 
   movieId: string | null = null;
   trailerUrl: SafeResourceUrl | null = null; // Use SafeResourceUrl for sanitized URLs
@@ -300,6 +301,11 @@ export class MovieDetailsComponent implements OnInit {
           this.fetchReviews(this.movieId!, 1); // Re-fetch reviews
           this.newReviewContent = '';
           this.newReviewRating = 5;
+
+          this.successMessage = 'Your review has been submitted successfully!';
+          setTimeout(() => {
+            this.successMessage = ''; 
+          }, 5000);
         } else {
           this.showTemporaryError('Failed to submit review. Please try again.');
         }
