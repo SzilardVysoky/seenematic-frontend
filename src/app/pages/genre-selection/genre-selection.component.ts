@@ -11,14 +11,18 @@ import { Router } from '@angular/router';
   styleUrls: ['./genre-selection.component.css']
 })
 export class GenreSelectionComponent {
-  genres: string[] = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 
-    'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 
-    'Horror', 'Music', 'Mystery', 'Romance', 'Science Fiction', 
+  genres: string[] = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime',
+    'Documentary', 'Drama', 'Family', 'Fantasy', 'History',
+    'Horror', 'Music', 'Mystery', 'Romance', 'Science Fiction',
     'TV Movie', 'Thriller', 'War', 'Western'];
+
   selectedGenres: string[] = [];
   errorMessage: string | null = null;
+  infoMessage: string = '';
+  infoMessageVisible: boolean = false;
+  countdown: number = 5;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   toggleGenre(genre: string): void {
     const index = this.selectedGenres.indexOf(genre);
@@ -50,13 +54,30 @@ export class GenreSelectionComponent {
     // Proceed to submit genres
     this.authService.selectGenres(this.selectedGenres).subscribe({
       next: () => {
-        alert('Genres submitted successfully! Redirecting to homepage...');
-        this.router.navigate(['/']);
+        this.infoMessage = 'Thank you for selecting your favourite genres.';
+        this.infoMessageVisible = true;
+        this.startCountdown();
       },
       error: (error) => {
         this.errorMessage = error.error.message || 'Unable to save genres. Please try again.';
         setTimeout(() => (this.errorMessage = null), 5000);
       }
     });
+  }
+
+  startCountdown() {
+    const interval = setInterval(() => {
+      if (this.countdown === 1) {
+        clearInterval(interval);
+        this.redirectNow();
+      } else {
+        this.countdown--;
+      }
+    }, 1000);
+  }
+
+  redirectNow() {
+    this.infoMessageVisible = false;
+    this.router.navigate(['/']);
   }
 }

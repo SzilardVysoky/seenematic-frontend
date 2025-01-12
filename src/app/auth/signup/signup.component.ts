@@ -9,7 +9,7 @@ import { Filter } from 'bad-words';
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [FormsModule, CommonModule], 
+  imports: [FormsModule, CommonModule],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
@@ -18,18 +18,21 @@ export class SignupComponent {
   email: string = '';
   password: string = '';
   errorMessage: string = '';
+  infoMessage: string = '';
+  infoMessageVisible: boolean = false;
+  countdown: number = 10;
 
   usernameError: boolean = false;
   emailError: boolean = false;
   passwordError: boolean = false;
 
   private filter: Filter;
- 
+
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {
-    
-    this.filter = new Filter(); 
-    
+
+    this.filter = new Filter();
+
     this.filter.addWords(
       'dumbass', 'idiot', 'moron', 'scumbag', 'jackass', 'loser',
       'jerk', 'fuckboy', 'thot', 'wanker', 'bollocks', 'tosser',
@@ -77,7 +80,7 @@ export class SignupComponent {
       this.errorMessage = 'Please enter a valid email address.';
       this.emailError = true;
       return false;
-  }
+    }
 
     if (!this.password) {
       this.errorMessage = 'Password is required. Please fill it.';
@@ -98,17 +101,17 @@ export class SignupComponent {
       return false;
     }
 
-    this.errorMessage = ''; 
+    this.errorMessage = '';
     return true;
   }
 
   onSignup() {
 
     if (!this.validateInput()) {
-      return; 
+      return;
     }
 
-    const url = 'https://seenematic-backend-production.up.railway.app/api/auth/register'; 
+    const url = 'https://seenematic-backend-production.up.railway.app/api/auth/register';
     const body = { name: this.username, email: this.email, password: this.password };
 
     this.http.post(url, body).subscribe({
@@ -120,13 +123,30 @@ export class SignupComponent {
           this.authService.saveToken(response.token);
         }
 
-        alert('Registration successful! Please select your favourite genres.'); 
-        this.router.navigate(['/genre-selection']);
+        this.infoMessage = 'Please select your favourite genres.';
+        this.infoMessageVisible = true;
+        this.startCountdown();
       },
       error: (error) => {
         console.error('Error during registration', error);
-        this.errorMessage = error.error.message || 'Registration failed. Please try again.'; 
+        this.errorMessage = error.error.message || 'Registration failed. Please try again.';
       },
     });
+  }
+
+  startCountdown() {
+    const interval = setInterval(() => {
+      if (this.countdown === 1) {
+        clearInterval(interval);
+        this.redirectNow();
+      } else {
+        this.countdown--;
+      }
+    }, 1000);
+  }
+
+  redirectNow() {
+    this.infoMessageVisible = false;
+    this.router.navigate(['/genre-selection']);
   }
 }
