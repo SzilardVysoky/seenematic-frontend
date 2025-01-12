@@ -17,6 +17,10 @@ export class HomePageComponent implements OnInit {
   latestMovies: any[] = [];
   recommendedMovies: any[] = [];
 
+  isLoadingTrending = true;
+  isLoadingLatest = true;
+  isLoadingRecommended = true;
+  
   currentTrendingIndex = 0;
   currentLatestIndex = 0;
   currentRecommendedIndex = 0;
@@ -59,38 +63,43 @@ export class HomePageComponent implements OnInit {
     }
   }
 
-  moveCarousel(type: string, direction: number) {
-    const movies = type === 'trending' ? this.trendingMovies : this.latestMovies;
-    const currentIndex = type === 'trending' ? this.currentTrendingIndex : this.currentLatestIndex;
-    const maxIndex = Math.ceil(movies.length / this.getVisibleItems()) - 1;
+  moveCarousel(type: string, direction: number): void {
+    let movies = [];
+    let currentIndex = 0;
   
-    if (direction > 0) { // Moving forward
-      const newIndex = currentIndex + 1;
-      if (newIndex > maxIndex) {
-        // If it's the last slide, loop back to the beginning
-        if (type === 'trending') {
-          this.currentTrendingIndex = 0;
-        } else {
-          this.currentLatestIndex = 0;
-        }
-      } else {
-        // Next slide
-        if (type === 'trending') {
-          this.currentTrendingIndex = newIndex;
-        } else {
-          this.currentLatestIndex = newIndex;
-        }
-      }
-    } else { // Moving backward (Previous button)
-      const newIndex = Math.max(0, currentIndex - 1);
-      if (type === 'trending') {
-        this.currentTrendingIndex = newIndex;
-      } else {
-        this.currentLatestIndex = newIndex;
-      }
+    // Movie list and current index based on the type
+    if (type === 'trending') {
+      movies = this.trendingMovies;
+      currentIndex = this.currentTrendingIndex;
+    } else if (type === 'latest') {
+      movies = this.latestMovies;
+      currentIndex = this.currentLatestIndex;
+    } else if (type === 'recommended') {
+      movies = this.recommendedMovies;
+      currentIndex = this.currentRecommendedIndex;
+    }
+  
+    // Calc max. index for the carousel based on visible items
+    const visibleItems = this.getVisibleItems();
+    const maxIndex = movies.length - visibleItems;
+  
+    // Update the index based on the direction
+    if (direction > 0) {
+      currentIndex = (currentIndex + 1) > maxIndex ? 0 : currentIndex + 1;
+    } else { 
+      currentIndex = (currentIndex - 1) < 0 ? maxIndex : currentIndex - 1;
+    }
+  
+    // Update the correct index based on the type
+    if (type === 'trending') {
+      this.currentTrendingIndex = currentIndex;
+    } else if (type === 'latest') {
+      this.currentLatestIndex = currentIndex;
+    } else if (type === 'recommended') {
+      this.currentRecommendedIndex = currentIndex;
     }
   }
-
+  
   getVisibleItems(): number {
     switch (this.carouselItemWidth) {
       case 'w-full':
@@ -106,25 +115,35 @@ export class HomePageComponent implements OnInit {
     }
   }
 
-  getTransformStyle(index: number) {
-    const translateValue = -index * 100;
+  getTransformStyle(index: number): string {
+    const translateValue = -index * (100 / this.getVisibleItems());
     return `translateX(${translateValue}%)`;
   }
 
   fetchRecommendedMovies(): void {
-    const url = 'https://seenematic-backend-production.up.railway.app/api/user/recommended'; // !!!!!!!!!!!NEED API!!!!!!!!!!!
-    this.http.get<any[]>(url).subscribe({
+    const url = 'https://seenematic-backend-production.up.railway.app/api/user/recommended';
+    const headers = { Authorization: `Bearer ${this.authService.getToken()}` };
+  
+    this.http.get<{ success: boolean; recommendations: any[]; message?: string }>(url, { headers }).subscribe({
       next: (response) => {
-        this.recommendedMovies = response.map((movie) => ({
-          title: movie.title,
-          rating: Math.round(movie.vote_average * 10), // Convert TMDB rating to percentage
-          image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-          id: movie.id,
-        }));
+        if (response.success) {
+          this.recommendedMovies = response.recommendations.map((movie) => ({
+            title: movie.title,
+            rating: Math.round(movie.rating * 10), // Convert TMDB rating to percentage
+            image: `https://image.tmdb.org/t/p/w500${movie.posterPath}`,
+            id: movie.id,
+          }));
+        } else {
+          console.warn(response.message || 'No recommendations found');
+          this.recommendedMovies = [];
+        }
       },
       error: (error) => {
         console.error('Error fetching recommended movies:', error);
         this.recommendedMovies = [];
+      },
+      complete: () => {
+        this.isLoadingRecommended = false; 
       },
     });
   }
@@ -142,7 +161,9 @@ export class HomePageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching trending movies:', error);
-        this.trendingMovies = [];
+      },
+      complete: () => {
+        this.isLoadingTrending = false; 
       },
     });
   }
@@ -163,7 +184,9 @@ export class HomePageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching latest movies:', error);
-        this.latestMovies = []; // Default to an empty array
+      },
+      complete: () => {
+        this.isLoadingLatest = false; 
       },
     });
   }

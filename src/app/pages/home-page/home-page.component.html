@@ -9,6 +9,18 @@
         Recommended Movies
       </h2>
     </div>
+
+    <ng-container *ngIf="isLoadingRecommended; else recommendedMoviesContent">
+      <div class="flex items-center justify-center h-16">
+        <div class="loader border-t-4 border-blue-600 rounded-full w-10 h-10 animate-spin"></div>
+      </div>
+    </ng-container>
+  
+    <ng-template #recommendedMoviesContent>
+      <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
+      </div>
+    </ng-template>
+
     <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
       <!-- Previous Button -->
       <button 
@@ -107,6 +119,18 @@
         Trending Movies
       </h2>
     </div>
+
+    <ng-container *ngIf="isLoadingTrending; else trendingMoviesContent">
+      <div class="flex items-center justify-center h-16">
+        <div class="loader border-t-4 border-blue-600 rounded-full w-10 h-10 animate-spin"></div>
+      </div>
+    </ng-container>
+  
+    <ng-template #trendingMoviesContent>
+      <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
+      </div>
+    </ng-template>
+    
     <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
       <!-- Previous Button -->
       <button 
@@ -207,6 +231,18 @@
         Latest Movies
       </h2>
     </div>
+
+    <ng-container *ngIf="isLoadingLatest; else latestMoviesContent">
+      <div class="flex items-center justify-center h-16">
+        <div class="loader border-t-4 border-blue-600 rounded-full w-10 h-10 animate-spin"></div>
+      </div>
+    </ng-container>
+  
+    <ng-template #latestMoviesContent>
+      <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
+      </div>
+    </ng-template>
+
     <div class="relative max-w-screen-lg mx-auto overflow-hidden bg-blue-50 rounded-lg shadow-md">
       <!-- Previous Button -->
       <button 
