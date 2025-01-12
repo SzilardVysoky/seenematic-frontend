@@ -11,6 +11,7 @@ import { SignupComponent } from './auth/signup/signup.component';
 import { GenreSelectionComponent } from './pages/genre-selection/genre-selection.component';
 import { GenreSelectionGuard } from './guards/genre-selection.guard';
 import { ProfileGuard } from './guards/profile.guard';
+import { ContactsComponent } from './pages/contacts/contacts.component';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -23,6 +24,7 @@ export const routes: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'genre-selection', component: GenreSelectionComponent, canActivate: [GenreSelectionGuard] },
   { path: 'favorites', component: FavouritesComponent },
+  { path: 'contacts', component: ContactsComponent },
   { path: '**', redirectTo: '' } // Redirect to home if the route doesn't exist
 ];
 
