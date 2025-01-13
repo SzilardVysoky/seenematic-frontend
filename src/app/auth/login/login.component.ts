@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';  
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';  
 import { CommonModule } from '@angular/common';
-import {environment } from '../../../environments/environment';
+import {environment } from '../../../environments/environment.dev';
 
 @Component({
   selector: 'app-login',

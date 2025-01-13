@@ -4,7 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { NgFor, NgStyle, NgClass, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import {environment } from '../../../environments/environment';
+import {environment } from '../../../environments/environment.dev';
 
 @Component({
   selector: 'app-home-page',

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import {environment } from '../../../environments/environment';
+import {environment } from '../../../environments/environment.dev';
 
 @Component({
   selector: 'app-all-movies',

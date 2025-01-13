@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Filter } from 'bad-words';
-import {environment } from '../../../environments/environment';
+import {environment } from '../../../environments/environment.dev';
 
 @Component({
   selector: 'app-signup',

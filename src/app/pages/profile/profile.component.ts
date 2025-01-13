@@ -3,7 +3,7 @@ import { AuthService } from '../../services/auth.service';
 import { NgFor, NgIf, DatePipe, SlicePipe } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import {environment } from '../../../environments/environment';
+import {environment } from '../../../environments/environment.dev';
 
 @Component({
   selector: 'app-profile',
