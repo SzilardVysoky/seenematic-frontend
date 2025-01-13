@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { RouterModule } from '@angular/router';
+import {environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-favourites',
@@ -20,7 +21,7 @@ export class FavouritesComponent implements OnInit {
   }
 
   fetchFavouriteMovies(): void {
-    const url = 'https://seenematic-backend-production.up.railway.app/api/user/favorites';
+    const url = `${environment.backendUrl}/api/user/favorites`;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
 
     this.http.get<{ favorites: string[] }>(url, { headers }).subscribe({
@@ -29,7 +30,7 @@ export class FavouritesComponent implements OnInit {
 
         // Fetch movie details for each favorite movie
         const movieDetailsRequests = movieIds.map((movieId) =>
-          this.http.get<any>(`https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}`).toPromise()
+          this.http.get<any>(`${environment.backendUrl}/api/tmdb/movie/${movieId}`).toPromise()
         );
 
         Promise.all(movieDetailsRequests)

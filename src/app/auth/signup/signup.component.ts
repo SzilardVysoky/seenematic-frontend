@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Filter } from 'bad-words';
+import {environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-signup',
@@ -111,7 +112,7 @@ export class SignupComponent {
       return;
     }
 
-    const url = 'https://seenematic-backend-production.up.railway.app/api/auth/register';
+    const url = `${environment.backendUrl}/api/auth/register`;
     const body = { name: this.username, email: this.email, password: this.password };
 
     this.http.post(url, body).subscribe({

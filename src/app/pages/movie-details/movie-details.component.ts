@@ -7,6 +7,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { Filter } from 'bad-words';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; 
+import {environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-movie-details',
@@ -86,7 +87,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   fetchMovieDetails(movieId: string): void {
-    const url = `https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}`;
+    const url = `${environment.backendUrl}/api/tmdb/movie/${movieId}`;
     this.http.get(url).subscribe({
       next: (response) => {
         this.movie = response;
@@ -98,7 +99,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   fetchMovieTrailer(movieId: string): void {
-    const url = `https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}/trailers`;
+    const url = `${environment.backendUrl}/api/tmdb/movie/${movieId}/trailers`;
     this.http.get(url).subscribe({
       next: (response: any) => {
         if (Array.isArray(response)) {
@@ -123,7 +124,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   checkIfFavourite(): void {
-    const url = 'https://seenematic-backend-production.up.railway.app/api/user/favorites';
+    const url = `${environment.backendUrl}/api/user/favorites`;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
 
     this.http.get<{ favorites: string[] }>(url, { headers }).subscribe({
@@ -137,7 +138,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   toggleFavourite(): void {
-    const url = `https://seenematic-backend-production.up.railway.app/api/user/favorites/${this.movieId}`;
+    const url = `${environment.backendUrl}/api/user/favorites/${this.movieId}`;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
 
     const request = this.isFavorite
@@ -156,8 +157,8 @@ export class MovieDetailsComponent implements OnInit {
 
 
   fetchReviews(movieId: string, page: number, callback?: () => void): void {
-    const tmdbUrl = `https://seenematic-backend-production.up.railway.app/api/review/t-reviews/list/${movieId}?page=${page}`;
-    const userUrl = `https://seenematic-backend-production.up.railway.app/api/review/list/${movieId}?page=${page}`;
+    const tmdbUrl = `${environment.backendUrl}/api/review/t-reviews/list/${movieId}?page=${page}`;
+    const userUrl = `${environment.backendUrl}/api/review/list/${movieId}?page=${page}`;
 
     let reviewsLoaded = false;
 
@@ -284,7 +285,7 @@ export class MovieDetailsComponent implements OnInit {
       }
     }
 
-    const url = `https://seenematic-backend-production.up.railway.app/api/review/add/${this.movieId}`;
+    const url = `${environment.backendUrl}/api/review/add/${this.movieId}`;
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.authService.getToken()}`,
     });

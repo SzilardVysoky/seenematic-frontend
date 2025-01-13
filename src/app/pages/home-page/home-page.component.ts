@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { NgFor, NgStyle, NgClass, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import {environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home-page',
@@ -121,7 +122,7 @@ export class HomePageComponent implements OnInit {
   }
 
   fetchRecommendedMovies(): void {
-    const url = 'https://seenematic-backend-production.up.railway.app/api/user/recommended';
+    const url = `${environment.backendUrl}/api/user/recommended`;
     const headers = { Authorization: `Bearer ${this.authService.getToken()}` };
   
     this.http.get<{ success: boolean; recommendations: any[]; message?: string }>(url, { headers }).subscribe({
@@ -149,7 +150,7 @@ export class HomePageComponent implements OnInit {
   }
 
   fetchTrendingMovies(): void {
-    const url = 'https://seenematic-backend-production.up.railway.app/api/tmdb/trending';
+    const url = `${environment.backendUrl}/api/tmdb/trending`;
     this.http.get<any[]>(url).subscribe({
       next: (response) => {
         this.trendingMovies = response.map((movie) => ({
@@ -169,7 +170,7 @@ export class HomePageComponent implements OnInit {
   }
   
   fetchLatestMovies(page: number): void {
-    const url = `https://seenematic-backend-production.up.railway.app/api/tmdb/latest?page=${page}`;
+    const url = `${environment.backendUrl}/api/tmdb/latest?page=${page}`;
     this.http.get<any[]>(url).subscribe({
       next: (response) => {
         this.latestMovies = [

@@ -3,6 +3,7 @@ import { AuthService } from '../../services/auth.service';
 import { NgFor, NgIf, DatePipe, SlicePipe } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import {environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -44,7 +45,7 @@ export class ProfileComponent implements OnInit {
   }
 
   fetchFavoriteMovies(): void {
-    const url = 'https://seenematic-backend-production.up.railway.app/api/user/favorites';
+    const url = `${environment.backendUrl}/api/user/favorites`;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
   
     this.http.get<{ favorites: string[] }>(url, { headers }).subscribe({
@@ -53,7 +54,7 @@ export class ProfileComponent implements OnInit {
   
         // Fetch movie details for each favorite movie
         const movieDetailsRequests = movieIds.map((movieId) =>
-          this.http.get<any>(`https://seenematic-backend-production.up.railway.app/api/tmdb/movie/${movieId}`).toPromise()
+          this.http.get<any>(`${environment.backendUrl}/api/tmdb/movie/${movieId}`).toPromise()
         );
   
         Promise.all(movieDetailsRequests)
@@ -78,7 +79,7 @@ export class ProfileComponent implements OnInit {
 
   removeFromFavourites(event: Event, movieId: string): void {
     event.stopPropagation(); // Prevent the event from bubbling up to the parent
-    const url = `https://seenematic-backend-production.up.railway.app/api/user/favorites/${movieId}`;
+    const url = `${environment.backendUrl}/api/user/favorites/${movieId}`;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authService.getToken()}`);
   
     this.http.delete(url, { headers }).subscribe({
@@ -93,7 +94,7 @@ export class ProfileComponent implements OnInit {
   }
 
   fetchUserReviews(page: number): void {
-    const url = 'https://seenematic-backend-production.up.railway.app/api/review/my-reviews';
+    const url = `${environment.backendUrl}/api/review/my-reviews`;
     const token = this.authService.getToken();
     if (!token) {
       this.errorMessage = 'User is not authenticated.';

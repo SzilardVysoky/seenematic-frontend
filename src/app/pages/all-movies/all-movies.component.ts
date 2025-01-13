@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import {environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-all-movies',
@@ -40,7 +41,7 @@ export class AllMoviesComponent implements OnInit {
   ];
 
   movies: any[] = []; // Movies to display
-  apiUrl = 'https://seenematic-backend-production.up.railway.app/api/tmdb';
+  apiUrl = `${environment.backendUrl}/api/tmdb`;
 
   constructor(private http: HttpClient) {}
 

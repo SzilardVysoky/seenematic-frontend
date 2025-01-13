@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';  
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';  
 import { CommonModule } from '@angular/common';
+import {environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -64,7 +65,7 @@ export class LoginComponent {
       return; 
     }
 
-    const url = 'https://seenematic-backend-production.up.railway.app/api/auth/login'; 
+    const url = `${environment.backendUrl}/api/auth/login`; 
     const body = { email: this.email, password: this.password };
 
     this.http.post(url, body).subscribe({
